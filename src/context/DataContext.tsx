@@ -14,6 +14,8 @@ interface DataContextType {
   waitingItems: WaitingItem[];
   loading: boolean;
   isOnline: boolean;
+  isDemoMode: boolean;
+  resetDemoData: () => void;
   
   // Handlers
   addWorkLog: (log: Omit<WorkLog, 'id' | 'created_at'>) => Promise<void>;
@@ -65,51 +67,103 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [issues, setIssues] = useState<Issue[]>([]);
   const [waitingItems, setWaitingItems] = useState<WaitingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const isGuest = localStorage.getItem('cra_guest_session') === 'true';
 
-  // Initialize data from Supabase or localStorage
+  // Helper to load sample mock data into state
+  const loadMockData = () => {
+    setStudies(MOCK_STUDIES);
+    setContacts(MOCK_CONTACTS);
+    setMilestones(MOCK_MILESTONES);
+    setWorkLogs(MOCK_WORK_LOGS);
+    setTrainings(MOCK_TRAININGS);
+    setIssues(MOCK_ISSUES);
+    setWaitingItems(MOCK_WAITING);
+
+    localStorage.setItem(STORAGE_KEYS.STUDIES, JSON.stringify(MOCK_STUDIES));
+    localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(MOCK_CONTACTS));
+    localStorage.setItem(STORAGE_KEYS.MILESTONES, JSON.stringify(MOCK_MILESTONES));
+    localStorage.setItem(STORAGE_KEYS.WORK_LOGS, JSON.stringify(MOCK_WORK_LOGS));
+    localStorage.setItem(STORAGE_KEYS.TRAININGS, JSON.stringify(MOCK_TRAININGS));
+    localStorage.setItem(STORAGE_KEYS.ISSUES, JSON.stringify(MOCK_ISSUES));
+    localStorage.setItem(STORAGE_KEYS.WAITING, JSON.stringify(MOCK_WAITING));
+  };
+
+  // Reset/restore sample data manually
+  const resetDemoData = () => {
+    localStorage.removeItem(STORAGE_KEYS.STUDIES);
+    localStorage.removeItem(STORAGE_KEYS.CONTACTS);
+    localStorage.removeItem(STORAGE_KEYS.MILESTONES);
+    localStorage.removeItem(STORAGE_KEYS.WORK_LOGS);
+    localStorage.removeItem(STORAGE_KEYS.TRAININGS);
+    localStorage.removeItem(STORAGE_KEYS.ISSUES);
+    localStorage.removeItem(STORAGE_KEYS.WAITING);
+    loadMockData();
+  };
+
+  // Initialize data from Supabase or localStorage/Mock
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      if (isSupabaseConfigured) {
-        try {
-          const [sRes, cRes, mRes, wRes, tRes, iRes, wtRes] = await Promise.all([
-            supabase.from('studies').select('*').order('created_at', { ascending: false }),
-            supabase.from('study_contacts').select('*'),
-            supabase.from('study_milestones').select('*').order('sort_order'),
-            supabase.from('work_logs').select('*, studies(name)').order('date', { ascending: false }),
-            supabase.from('trainings').select('*').order('due_date'),
-            supabase.from('issues').select('*, studies(name)').order('due_date'),
-            supabase.from('waiting_items').select('*, studies(name), issues(title)'),
-          ]);
+      const isGuestSession = localStorage.getItem('cra_guest_session') === 'true';
 
-          if (sRes.data) setStudies(sRes.data);
+      // Always load mock/sample data in Guest/Demo session
+      if (isGuestSession || !isSupabaseConfigured) {
+        loadFromLocalOrMock();
+        setLoading(false);
+        return;
+      }
+
+      // If Supabase is connected and user is logged in
+      try {
+        const [sRes, cRes, mRes, wRes, tRes, iRes, wtRes] = await Promise.all([
+          supabase.from('studies').select('*').order('created_at', { ascending: false }),
+          supabase.from('study_contacts').select('*'),
+          supabase.from('study_milestones').select('*').order('sort_order'),
+          supabase.from('work_logs').select('*, studies(name)').order('date', { ascending: false }),
+          supabase.from('trainings').select('*').order('due_date'),
+          supabase.from('issues').select('*, studies(name)').order('due_date'),
+          supabase.from('waiting_items').select('*, studies(name), issues(title)'),
+        ]);
+
+        if (sRes.data && sRes.data.length > 0) {
+          setStudies(sRes.data);
           if (cRes.data) setContacts(cRes.data);
           if (mRes.data) setMilestones(mRes.data);
           if (wRes.data) setWorkLogs(wRes.data);
           if (tRes.data) setTrainings(tRes.data);
           if (iRes.data) setIssues(iRes.data);
           if (wtRes.data) setWaitingItems(wtRes.data);
-
-        } catch (err) {
-          console.warn('Supabase fetch failed, falling back to local state:', err);
-          loadFromLocal();
+        } else {
+          // If logged in Supabase user has no data yet, provide initial sample data
+          loadFromLocalOrMock();
         }
-      } else {
-        loadFromLocal();
+
+      } catch (err) {
+        console.warn('Supabase fetch failed, falling back to mock data:', err);
+        loadFromLocalOrMock();
       }
       setLoading(false);
     }
 
-    function loadFromLocal() {
+    function loadFromLocalOrMock() {
       const getLocal = <T,>(key: string, mock: T): T => {
         const item = localStorage.getItem(key);
         return item ? JSON.parse(item) : mock;
       };
 
-      setStudies(getLocal(STORAGE_KEYS.STUDIES, MOCK_STUDIES));
+      const loadedStudies = getLocal(STORAGE_KEYS.STUDIES, MOCK_STUDIES);
+      const loadedWorkLogs = getLocal(STORAGE_KEYS.WORK_LOGS, MOCK_WORK_LOGS);
+
+      // If local storage is empty or cleared, force mock sample data
+      if (!loadedStudies || loadedStudies.length === 0) {
+        loadMockData();
+        return;
+      }
+
+      setStudies(loadedStudies);
       setContacts(getLocal(STORAGE_KEYS.CONTACTS, MOCK_CONTACTS));
       setMilestones(getLocal(STORAGE_KEYS.MILESTONES, MOCK_MILESTONES));
-      setWorkLogs(getLocal(STORAGE_KEYS.WORK_LOGS, MOCK_WORK_LOGS));
+      setWorkLogs(loadedWorkLogs);
       setTrainings(getLocal(STORAGE_KEYS.TRAININGS, MOCK_TRAININGS));
       setIssues(getLocal(STORAGE_KEYS.ISSUES, MOCK_ISSUES));
       setWaitingItems(getLocal(STORAGE_KEYS.WAITING, MOCK_WAITING));
@@ -118,7 +172,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadData();
   }, []);
 
-  // Sync to localStorage
+  // Sync to localStorage for Guest/Offline
   useEffect(() => {
     if (!loading) {
       localStorage.setItem(STORAGE_KEYS.STUDIES, JSON.stringify(studies));
@@ -140,7 +194,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       studies: studies.find(s => s.id === logData.study_id) ? { name: studies.find(s => s.id === logData.study_id)!.name } : null
     };
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data, error } = await supabase.from('work_logs').insert([{
         date: logData.date,
         study_id: logData.study_id || null,
@@ -176,7 +230,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteWorkLog = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('work_logs').delete().eq('id', id);
     }
     setWorkLogs(prev => prev.filter(w => w.id !== id));
@@ -189,7 +243,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: 's-' + Date.now(),
       created_at: new Date().toISOString(),
     };
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('studies').insert([studyData]).select().single();
       if (data) newStudy.id = data.id;
     }
@@ -198,14 +252,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateStudy = async (id: string, updates: Partial<Study>) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('studies').update(updates).eq('id', id);
     }
     setStudies(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
 
   const deleteStudy = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('studies').delete().eq('id', id);
     }
     setStudies(prev => prev.filter(s => s.id !== id));
@@ -214,7 +268,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Contacts
   const addContact = async (contactData: Omit<StudyContact, 'id'>) => {
     const newContact: StudyContact = { ...contactData, id: 'c-' + Date.now() };
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('study_contacts').insert([contactData]).select().single();
       if (data) newContact.id = data.id;
     }
@@ -222,7 +276,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteContact = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('study_contacts').delete().eq('id', id);
     }
     setContacts(prev => prev.filter(c => c.id !== id));
@@ -236,7 +290,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newDone = !target.done;
     const newDate = newDone ? format(new Date(), 'yyyy-MM-dd') : undefined;
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('study_milestones').update({ done: newDone, done_date: newDate }).eq('id', id);
     }
 
@@ -245,7 +299,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addMilestone = async (m: Omit<StudyMilestone, 'id'>) => {
     const newM: StudyMilestone = { ...m, id: 'm-' + Date.now() };
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('study_milestones').insert([m]).select().single();
       if (data) newM.id = data.id;
     }
@@ -253,7 +307,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteMilestone = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('study_milestones').delete().eq('id', id);
     }
     setMilestones(prev => prev.filter(m => m.id !== id));
@@ -262,7 +316,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Trainings
   const addTraining = async (t: Omit<Training, 'id' | 'created_at' | 'updated_at'>) => {
     const newT: Training = { ...t, id: 't-' + Date.now() };
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('trainings').insert([t]).select().single();
       if (data) newT.id = data.id;
     }
@@ -270,14 +324,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateTraining = async (id: string, updates: Partial<Training>) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('trainings').update(updates).eq('id', id);
     }
     setTrainings(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
   };
 
   const deleteTraining = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('trainings').delete().eq('id', id);
     }
     setTrainings(prev => prev.filter(t => t.id !== id));
@@ -293,7 +347,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       studies: studies.find(s => s.id === issueData.study_id) ? { name: studies.find(s => s.id === issueData.study_id)!.name } : null
     };
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('issues').insert([{
         study_id: issueData.study_id || null,
         title: issueData.title,
@@ -314,14 +368,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateIssue = async (id: string, updates: Partial<Issue>) => {
     const patch = { ...updates, last_updated: new Date().toISOString() };
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('issues').update(patch).eq('id', id);
     }
     setIssues(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i));
   };
 
   const deleteIssue = async (id: string) => {
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('issues').delete().eq('id', id);
     }
     setIssues(prev => prev.filter(i => i.id !== id));
@@ -336,7 +390,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       studies: studies.find(s => s.id === item.study_id) ? { name: studies.find(s => s.id === item.study_id)!.name } : null
     };
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       const { data } = await supabase.from('waiting_items').insert([{
         issue_id: item.issue_id || null,
         study_id: item.study_id || null,
@@ -356,7 +410,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!item) return;
 
     const newRes = !item.resolved;
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && !isGuest) {
       await supabase.from('waiting_items').update({ resolved: newRes }).eq('id', id);
     }
     setWaitingItems(prev => prev.map(w => w.id === id ? { ...w, resolved: newRes } : w));
@@ -428,6 +482,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         waitingItems,
         loading,
         isOnline: isSupabaseConfigured,
+        isDemoMode: isGuest,
+        resetDemoData,
         addWorkLog,
         deleteWorkLog,
         addStudy,
