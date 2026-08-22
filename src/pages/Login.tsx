@@ -1,11 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Stethoscope, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import {
+  Stethoscope,
+  ShieldCheck,
+  CheckCircle2,
+  ArrowRight,
+  Smartphone,
+  Share,
+  PlusSquare,
+  MoreVertical,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Info
+} from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { user, guestUser, signInWithGoogle, enterAsGuest } = useAuth();
   const navigate = useNavigate();
+  const [showPwaGuide, setShowPwaGuide] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ios' | 'android'>('ios');
 
   useEffect(() => {
     if (user || guestUser) {
@@ -19,8 +34,8 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 py-8">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
         
         {/* App Logo & Header */}
         <div className="text-center space-y-3">
@@ -73,8 +88,135 @@ export const Login: React.FC = () => {
           </button>
         </div>
 
+        {/* 📲 PWA App Installation Guide Accordion */}
+        <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 transition-all duration-200">
+          <button
+            onClick={() => setShowPwaGuide(!showPwaGuide)}
+            className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-900/60 transition"
+          >
+            <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-indigo-300">
+              <Smartphone className="w-4 h-4 text-indigo-400 shrink-0" />
+              <span>📱 앱스토어 설치 없이 앱으로 사용하기 (가이드)</span>
+            </div>
+            {showPwaGuide ? (
+              <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+            )}
+          </button>
+
+          {showPwaGuide && (
+            <div className="p-4 pt-0 space-y-4 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
+              {/* PWA Simple Explanation */}
+              <div className="bg-indigo-950/40 border border-indigo-800/40 rounded-xl p-3 space-y-1 mt-3">
+                <div className="flex items-center gap-1.5 font-semibold text-indigo-300">
+                  <Info className="w-3.5 h-3.5 shrink-0" />
+                  <span>PWA(웹앱)이란 무엇인가요?</span>
+                </div>
+                <p className="text-slate-400 leading-relaxed">
+                  별도의 앱스토어 설치 없이 스마트폰 **홈 화면에 아이콘을 생성**하여, 실제 앱처럼 빠르고 독립적인 풀스크린 화면으로 사용하는 기술입니다.
+                </p>
+              </div>
+
+              {/* Tabs: iPhone vs Android */}
+              <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800">
+                <button
+                  onClick={() => setActiveTab('ios')}
+                  className={`flex-1 py-1.5 font-bold rounded-lg text-center transition ${
+                    activeTab === 'ios'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  🍎 iPhone (Safari)
+                </button>
+                <button
+                  onClick={() => setActiveTab('android')}
+                  className={`flex-1 py-1.5 font-bold rounded-lg text-center transition ${
+                    activeTab === 'android'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  🤖 Android (Chrome/Samsung)
+                </button>
+              </div>
+
+              {/* iOS Guide */}
+              {activeTab === 'ios' && (
+                <div className="space-y-2.5 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">Safari 브라우저 하단 공유 버튼 클릭</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        화면 하단 중앙의 <Share className="w-3.5 h-3.5 text-blue-400 inline" /> (공유) 아이콘을 누릅니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">'홈 화면에 추가' 선택</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        메뉴 목록을 내려 <PlusSquare className="w-3.5 h-3.5 text-blue-400 inline" /> <strong>[홈 화면에 추가]</strong> 버튼을 터치합니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">우측 상단 '추가' 누르기</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        홈 화면에 CRA / PL 앱 아이콘이 생성되어 언제든 바로 접속 가능합니다!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Android Guide */}
+              {activeTab === 'android' && (
+                <div className="space-y-2.5 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">Chrome/삼성 인터넷 메뉴 버튼 클릭</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        우측 상단 메뉴 <MoreVertical className="w-3.5 h-3.5 text-emerald-400 inline" /> (더보기) 아이콘을 클릭합니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">'앱 설치' 또는 '홈 화면에 추가' 선택</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline" /> <strong>[앱 설치]</strong> 또는 <strong>[홈 화면에 추가]</strong>를 누릅니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">'설치' 누르기 완료</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        스마트폰 앱 서랍 및 홈 화면에 앱 형태 아이콘이 즉시 등록됩니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Security Note */}
-        <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center">
+        <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center pt-2">
           <ShieldCheck className="w-4 h-4 text-slate-400" />
           <span>보안된 개인 대시보드 환경</span>
         </div>
