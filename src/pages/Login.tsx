@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Stethoscope, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
-import { isSupabaseConfigured } from '../lib/supabase';
 
 export const Login: React.FC = () => {
-  const { signInWithGoogle, enterAsGuest } = useAuth();
+  const { user, guestUser, signInWithGoogle, enterAsGuest } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user || guestUser) {
+      navigate('/', { replace: true });
+    }
+  }, [user, guestUser, navigate]);
+
+  const handleGuestLogin = () => {
+    enterAsGuest();
+    navigate('/', { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
@@ -53,8 +65,8 @@ export const Login: React.FC = () => {
           </button>
 
           <button
-            onClick={enterAsGuest}
-            className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm"
+            onClick={handleGuestLogin}
+            className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm active:scale-[0.98]"
           >
             <span>로그인 없이 둘러보기 (데모 모드)</span>
             <ArrowRight className="w-4 h-4" />
