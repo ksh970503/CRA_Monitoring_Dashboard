@@ -12,8 +12,7 @@ import {
   MoreVertical,
   Download,
   ChevronDown,
-  ChevronUp,
-  Info
+  ChevronUp
 } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -88,7 +87,7 @@ export const Login: React.FC = () => {
           </button>
         </div>
 
-        {/* 📲 PWA App Installation Guide Accordion */}
+        {/* 📱 PWA App Installation Guide Accordion */}
         <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 transition-all duration-200">
           <button
             onClick={() => setShowPwaGuide(!showPwaGuide)}
@@ -96,7 +95,7 @@ export const Login: React.FC = () => {
           >
             <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-indigo-300">
               <Smartphone className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>📱 앱스토어 설치 없이 앱으로 사용하기 (가이드)</span>
+              <span>📱 앱으로 사용하기 (가이드)</span>
             </div>
             {showPwaGuide ? (
               <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
@@ -106,18 +105,7 @@ export const Login: React.FC = () => {
           </button>
 
           {showPwaGuide && (
-            <div className="p-4 pt-0 space-y-4 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
-              {/* PWA Simple Explanation */}
-              <div className="bg-indigo-950/40 border border-indigo-800/40 rounded-xl p-3 space-y-1 mt-3">
-                <div className="flex items-center gap-1.5 font-semibold text-indigo-300">
-                  <Info className="w-3.5 h-3.5 shrink-0" />
-                  <span>PWA(웹앱)이란 무엇인가요?</span>
-                </div>
-                <p className="text-slate-400 leading-relaxed">
-                  별도의 앱스토어 설치 없이 스마트폰 **홈 화면에 아이콘을 생성**하여, 실제 앱처럼 빠르고 독립적인 풀스크린 화면으로 사용하는 기술입니다.
-                </p>
-              </div>
-
+            <div className="p-4 pt-2 space-y-4 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
               {/* Tabs: iPhone vs Android */}
               <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800">
                 <button
@@ -170,7 +158,7 @@ export const Login: React.FC = () => {
                     <div>
                       <p className="font-semibold text-slate-200">우측 상단 '추가' 누르기</p>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        홈 화면에 CRA / PL 앱 아이콘이 생성되어 언제든 바로 접속 가능합니다!
+                        홈 화면에 CRA / PL 전용 앱 아이콘이 생성됩니다!
                       </p>
                     </div>
                   </div>
@@ -205,7 +193,7 @@ export const Login: React.FC = () => {
                     <div>
                       <p className="font-semibold text-slate-200">'설치' 누르기 완료</p>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        스마트폰 앱 서랍 및 홈 화면에 앱 형태 아이콘이 즉시 등록됩니다.
+                        스마트폰 앱 서랍 및 홈 화면에 앱 형태 아이콘이 생성됩니다.
                       </p>
                     </div>
                   </div>
