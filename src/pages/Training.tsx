@@ -12,7 +12,8 @@ import {
   AlertCircle,
   FileText,
   Trash2,
-  X
+  X,
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -121,11 +122,11 @@ export const TrainingPage: React.FC = () => {
   const getStatusBadge = (st: TrainingStatus) => {
     switch (st) {
       case '완료':
-        return <span className="px-2.5 py-1 rounded-xl bg-emerald-950/60 text-emerald-300 border border-emerald-800 text-xs font-bold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> 완료</span>;
+        return <span className="px-2.5 py-1 rounded-xl bg-emerald-950/60 text-emerald-300 border border-emerald-800 text-xs font-bold flex items-center gap-1 shrink-0"><CheckCircle2 className="w-3.5 h-3.5" /> 완료</span>;
       case '예정':
-        return <span className="px-2.5 py-1 rounded-xl bg-amber-950/60 text-amber-300 border border-amber-800 text-xs font-bold flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> 예정</span>;
+        return <span className="px-2.5 py-1 rounded-xl bg-amber-950/60 text-amber-300 border border-amber-800 text-xs font-bold flex items-center gap-1 shrink-0"><Clock className="w-3.5 h-3.5" /> 예정</span>;
       case '미수강':
-        return <span className="px-2.5 py-1 rounded-xl bg-rose-950/60 text-rose-300 border border-rose-800 text-xs font-bold flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> 미수강</span>;
+        return <span className="px-2.5 py-1 rounded-xl bg-rose-950/60 text-rose-300 border border-rose-800 text-xs font-bold flex items-center gap-1 shrink-0"><AlertCircle className="w-3.5 h-3.5" /> 미수강</span>;
     }
   };
 
@@ -149,8 +150,88 @@ export const TrainingPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Trainings Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl backdrop-blur-sm card-spring">
+      {/* 📱 Mobile Card List (md:hidden) */}
+      <div className="space-y-3 md:hidden">
+        {trainings.length === 0 ? (
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 text-center text-slate-500 text-xs">
+            등록된 교육이 없습니다.
+          </div>
+        ) : (
+          trainings.map((t) => (
+            <div
+              key={t.id}
+              onClick={() => openEditModal(t)}
+              className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg hover:border-slate-700 active:scale-[0.99] transition card-spring cursor-pointer"
+            >
+              {/* Header: Name + Badge */}
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-bold text-white text-base leading-snug break-keep">
+                  {t.name}
+                </h3>
+                {getStatusBadge(t.status)}
+              </div>
+
+              {/* Info Chips */}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300 pt-1">
+                <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+                  <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                  <span>수강기한: <strong className="text-white font-mono">{t.due_date || '-'}</strong></span>
+                </div>
+
+                {t.completed_date && (
+                  <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>완료일: <strong className="text-emerald-300 font-mono">{t.completed_date}</strong></span>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  {t.link && (
+                    <a
+                      href={t.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 bg-blue-950/70 hover:bg-blue-900 border border-blue-800 text-blue-300 font-medium rounded-lg flex items-center gap-1.5 active:scale-95 transition"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                      <span>교육 접속</span>
+                    </a>
+                  )}
+
+                  {t.certificate_file_url && (
+                    <a
+                      href={t.certificate_file_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 font-medium rounded-lg flex items-center gap-1.5 active:scale-95 transition"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>수료증 보기</span>
+                    </a>
+                  )}
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTraining(t.id);
+                  }}
+                  className="p-2 text-slate-500 hover:text-rose-400 rounded-lg active:scale-90 transition"
+                  title="삭제"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* 🖥️ Desktop Trainings Table (hidden md:block) */}
+      <div className="hidden md:block bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl backdrop-blur-sm card-spring">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-300">
             <thead className="bg-slate-950/80 text-xs uppercase text-slate-400 border-b border-slate-800">

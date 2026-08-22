@@ -68,7 +68,7 @@ export const Login: React.FC = () => {
             onClick={handleGuestLogin}
             className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm active:scale-[0.98]"
           >
-            <span>로그인 없이 둘러보기 (데모 모드)</span>
+            <span>활용 예시 (데모 모드)</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
