@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Stethoscope,
+  Heart,
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
@@ -39,7 +39,7 @@ export const Login: React.FC = () => {
         {/* App Logo & Header */}
         <div className="text-center space-y-3">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-xl shadow-blue-500/20">
-            <Stethoscope className="w-9 h-9 text-white" />
+            <Heart className="w-9 h-9 text-white fill-white" />
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-white tracking-tight">CRA / PL 업무관리</h1>
@@ -181,9 +181,9 @@ export const Login: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">'앱 설치' 또는 '홈 화면에 추가'</p>
+                      <p className="font-semibold text-slate-200 leading-snug">'앱 설치' 선택 (중요)</p>
                       <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
-                        목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> <strong>[앱 설치]</strong>를 선택합니다.
+                        목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> <strong>[앱 설치]</strong> (또는 홈 화면에 추가)를 선택합니다.
                       </p>
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export const Login: React.FC = () => {
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-200 leading-snug">'설치' 누르기 완료</p>
                       <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                        스마트폰 앱 서랍 및 홈 화면에 앱 형태 아이콘이 생성됩니다.
+                        주소창 없는 **독립 실행 독립 앱**으로 홈 화면에 생성됩니다!
                       </p>
                     </div>
                   </div>

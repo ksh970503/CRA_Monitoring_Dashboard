@@ -9,28 +9,47 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png'],
+      devOptions: {
+        enabled: true
+      },
       manifest: {
-        name: 'CRA/PL Work Manager',
-        short_name: 'CRA Manager',
-        description: 'CRA/PL Personal Work & Issue Management App',
-        theme_color: '#2563eb',
-        background_color: '#f8fafc',
+        name: 'CRA / PL 업무관리',
+        short_name: 'CRA 업무',
+        description: 'CRA/PL 개인 업무 & Outstanding Issue 모니터링 앱',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
         display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
       }
     })
   ],
 })
-
