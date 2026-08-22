@@ -33,8 +33,8 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 py-8">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl space-y-6">
         
         {/* App Logo & Header */}
         <div className="text-center space-y-3">
@@ -48,7 +48,7 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Feature Highlights */}
-        <div className="bg-slate-800/50 rounded-2xl p-4 space-y-2.5 border border-slate-800 text-xs text-slate-300">
+        <div className="bg-slate-800/50 rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-slate-800 text-xs text-slate-300">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>오늘 / 3일 내 마감 임박 항목 자동 알림</span>
@@ -91,11 +91,11 @@ export const Login: React.FC = () => {
         <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 transition-all duration-200">
           <button
             onClick={() => setShowPwaGuide(!showPwaGuide)}
-            className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-900/60 transition"
+            className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-slate-900/60 transition gap-2"
           >
-            <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-indigo-300">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-300 min-w-0">
               <Smartphone className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>📱 앱으로 사용하기 (가이드)</span>
+              <span className="truncate break-keep">📱 앱으로 사용하기 (가이드)</span>
             </div>
             {showPwaGuide ? (
               <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
@@ -105,12 +105,12 @@ export const Login: React.FC = () => {
           </button>
 
           {showPwaGuide && (
-            <div className="p-4 pt-2 space-y-4 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
+            <div className="p-3.5 sm:p-4 pt-1 sm:pt-2 space-y-3.5 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
               {/* Tabs: iPhone vs Android */}
-              <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800">
+              <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800 gap-1">
                 <button
                   onClick={() => setActiveTab('ios')}
-                  className={`flex-1 py-1.5 font-bold rounded-lg text-center transition ${
+                  className={`flex-1 py-1.5 px-1 font-bold rounded-lg text-center transition text-[11px] sm:text-xs truncate ${
                     activeTab === 'ios'
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-slate-200'
@@ -120,44 +120,44 @@ export const Login: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab('android')}
-                  className={`flex-1 py-1.5 font-bold rounded-lg text-center transition ${
+                  className={`flex-1 py-1.5 px-1 font-bold rounded-lg text-center transition text-[11px] sm:text-xs truncate ${
                     activeTab === 'android'
                       ? 'bg-emerald-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  🤖 Android (Chrome/Samsung)
+                  🤖 Android (Chrome)
                 </button>
               </div>
 
               {/* iOS Guide */}
               {activeTab === 'ios' && (
-                <div className="space-y-2.5 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
-                  <div className="flex items-start gap-2.5">
+                <div className="space-y-2.5 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">Safari 브라우저 하단 공유 버튼 클릭</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        화면 하단 중앙의 <Share className="w-3.5 h-3.5 text-blue-400 inline" /> (공유) 아이콘을 누릅니다.
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">Safari 하단 공유 버튼 클릭</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                        화면 하단 중앙의 <Share className="w-3.5 h-3.5 text-blue-400 inline shrink-0" /> (공유) 아이콘을 누릅니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">'홈 화면에 추가' 선택</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        메뉴 목록을 내려 <PlusSquare className="w-3.5 h-3.5 text-blue-400 inline" /> <strong>[홈 화면에 추가]</strong> 버튼을 터치합니다.
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">'홈 화면에 추가' 선택</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                        메뉴에서 <PlusSquare className="w-3.5 h-3.5 text-blue-400 inline shrink-0" /> <strong>[홈 화면에 추가]</strong>를 터치합니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">우측 상단 '추가' 누르기</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">우측 상단 '추가' 누르기</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                         홈 화면에 CRA / PL 전용 앱 아이콘이 생성됩니다!
                       </p>
                     </div>
@@ -167,32 +167,32 @@ export const Login: React.FC = () => {
 
               {/* Android Guide */}
               {activeTab === 'android' && (
-                <div className="space-y-2.5 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
-                  <div className="flex items-start gap-2.5">
+                <div className="space-y-2.5 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">Chrome/삼성 인터넷 메뉴 버튼 클릭</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        우측 상단 메뉴 <MoreVertical className="w-3.5 h-3.5 text-emerald-400 inline" /> (더보기) 아이콘을 클릭합니다.
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">Chrome/삼성 브라우저 메뉴 클릭</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                        우측 상단 <MoreVertical className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> (더보기) 아이콘을 누릅니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">'앱 설치' 또는 '홈 화면에 추가' 선택</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline" /> <strong>[앱 설치]</strong> 또는 <strong>[홈 화면에 추가]</strong>를 누릅니다.
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">'앱 설치' 또는 '홈 화면에 추가'</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                        목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> <strong>[앱 설치]</strong>를 선택합니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-                    <div>
-                      <p className="font-semibold text-slate-200">'설치' 누르기 완료</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-200 leading-snug">'설치' 누르기 완료</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                         스마트폰 앱 서랍 및 홈 화면에 앱 형태 아이콘이 생성됩니다.
                       </p>
                     </div>
@@ -204,7 +204,7 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Security Note */}
-        <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center pt-2">
+        <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center pt-1">
           <ShieldCheck className="w-4 h-4 text-slate-400" />
           <span>보안된 개인 대시보드 환경</span>
         </div>
