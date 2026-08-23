@@ -78,8 +78,7 @@
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .card-spring:hover {
-  transform: translateY(-3px);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
 }
-.card-spring:active {
-  transform: translateY(0px) scale(0.98);
-}
+/* Removed active scale(0.98) to prevent click missing on buttons */
