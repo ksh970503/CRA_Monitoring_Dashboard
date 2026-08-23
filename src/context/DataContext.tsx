@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { Study, WorkLog, Training, Issue, WaitingItem, StudyContact, StudyMilestone, DashboardSummary } from '../types';
 import { MOCK_STUDIES, MOCK_CONTACTS, MOCK_MILESTONES, MOCK_WORK_LOGS, MOCK_TRAININGS, MOCK_ISSUES, MOCK_WAITING } from '../lib/mockData';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -17,7 +17,7 @@ interface DataContextType {
   isDemoMode: boolean;
   isSyncing: boolean;
   resetDemoData: () => void;
-  syncAllToSupabase: () => Promise<{ success: boolean; message: string }>;
+  syncAllToSupabase: (silent?: boolean) => Promise<{ success: boolean; message: string }>;
   
   // Handlers
   addWorkLog: (log: Omit<WorkLog, 'id' | 'created_at'>) => Promise<void>;
@@ -238,9 +238,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   };
 
   // Sync All current local state to Supabase manually/automatically
-  const syncAllToSupabase = async () => {
+  const syncAllToSupabase = async (silent: boolean = false) => {
     if (!isSupabaseConfigured || isGuest || !userId) {
-      return { success: false, message: 'Supabase 로그인 상태가 아닙니다.' };
+      if (!silent) return { success: false, message: 'Supabase 로그인 상태가 아닙니다.' };
+      return { success: false, message: '' };
     }
     setIsSyncing(true);
     let successCount = 0;
@@ -413,11 +414,33 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
 
       setIsSyncing(false);
       
+      if (failCount === 0) {
+        // 성공 시 완전한 UUID 동기화를 위해 서버에서 최신 상태를 강제로 가져와 리셋합니다.
+        const [sRes, cRes, mRes, wRes, tRes, iRes, wtRes] = await Promise.all([
+          supabase.from('studies').select('*'),
+          supabase.from('study_contacts').select('*'),
+          supabase.from('study_milestones').select('*'),
+          supabase.from('work_logs').select('*, studies(name)'),
+          supabase.from('trainings').select('*'),
+          supabase.from('issues').select('*, studies(name)'),
+          supabase.from('waiting_items').select('*, studies(name)')
+        ]);
+        if (sRes.data) setStudies(sRes.data);
+        if (cRes.data) setContacts(cRes.data);
+        if (mRes.data) setMilestones(mRes.data);
+        if (wRes.data) setWorkLogs(wRes.data);
+        if (tRes.data) setTrainings(tRes.data);
+        if (iRes.data) setIssues(iRes.data);
+        if (wtRes.data) setWaitingItems(wtRes.data);
+      }
+
       if (failCount > 0) {
         console.error('syncAllToSupabase Error:', lastError);
-        return { success: false, message: `⚠️ ${failCount}건 저장 실패: ${lastError?.message || '알 수 없는 오류'} (다시 시도해주세요)` };
+        if (!silent) return { success: false, message: `⚠️ ${failCount}건 저장 실패: ${lastError?.message || '알 수 없는 오류'} (다시 시도해주세요)` };
+        return { success: false, message: '' };
       }
-      return { success: true, message: `✅ 서버 저장 성공 (동기화 ${successCount}건 완료)` };
+      if (!silent) return { success: true, message: `✅ 서버 저장 성공 (동기화 ${successCount}건 완료)` };
+      return { success: true, message: '' };
 
     } catch (err: any) {
       setIsSyncing(false);
@@ -562,6 +585,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       localStorage.setItem(keys.WAITING, JSON.stringify(waitingItems));
     }
   }, [studies, contacts, milestones, workLogs, trainings, issues, waitingItems, loading, storagePrefix]);
+
+  const syncRef = useRef(syncAllToSupabase);
+  syncRef.current = syncAllToSupabase;
+
+  // 1시간 간격 자동 서버 동기화
+  useEffect(() => {
+    if (isGuest || !isSupabaseConfigured || !userId) return;
+    const interval = setInterval(() => {
+      console.log('--- 1시간 자동 서버 저장 실행 ---');
+      syncRef.current(true);
+    }, 3600000);
+    return () => clearInterval(interval);
+  }, [isGuest, isSupabaseConfigured, userId]);
 
   // WorkLog Add + Auto Issue creation
   const addWorkLog = async (logData: Omit<WorkLog, 'id' | 'created_at'>) => {
