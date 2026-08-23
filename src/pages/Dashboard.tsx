@@ -54,6 +54,7 @@ export const Dashboard: React.FC = () => {
       urgent: summary.dueTodayCount > 0,
       activeBg: 'bg-rose-950/40 border-rose-800/80 text-rose-200 shadow-rose-950/50',
       dotColor: summary.dueTodayCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-slate-600',
+      link: '/issues',
     },
     {
       id: '3days',
@@ -64,6 +65,7 @@ export const Dashboard: React.FC = () => {
       urgent: summary.dueWithin3DaysCount > 0,
       activeBg: 'bg-amber-950/40 border-amber-800/80 text-amber-200',
       dotColor: 'bg-amber-400',
+      link: '/issues',
     },
     {
       id: 'waiting',
@@ -74,6 +76,7 @@ export const Dashboard: React.FC = () => {
       urgent: false,
       activeBg: 'bg-purple-950/30 border-purple-800/60 text-purple-200',
       dotColor: 'bg-purple-400',
+      link: '/issues',
     },
     {
       id: 'overdue',
@@ -84,6 +87,7 @@ export const Dashboard: React.FC = () => {
       urgent: summary.overdueCount > 0,
       activeBg: 'bg-red-950/60 border-red-700 text-red-200 animate-glow-rose',
       dotColor: 'bg-red-500',
+      link: '/issues',
     },
     {
       id: 'training',
@@ -94,6 +98,7 @@ export const Dashboard: React.FC = () => {
       urgent: false,
       activeBg: 'bg-indigo-950/30 border-indigo-800/60 text-indigo-200',
       dotColor: 'bg-indigo-400',
+      link: '/trainings',
     },
     {
       id: 'log',
@@ -102,6 +107,7 @@ export const Dashboard: React.FC = () => {
       urgent: summary.workLogMissingToday,
       activeBg: summary.workLogMissingToday ? 'bg-amber-950/40 border-amber-800 text-amber-200' : 'bg-emerald-950/40 border-emerald-800 text-emerald-200',
       dotColor: summary.workLogMissingToday ? 'bg-amber-400' : 'bg-emerald-400',
+      link: '/worklog',
     }
   ];
 
@@ -157,9 +163,10 @@ export const Dashboard: React.FC = () => {
       {/* 💻 DESKTOP GRID LAYOUT (6 Columns) */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-4">
         {cardsData.map((card) => (
-          <div
+          <Link
             key={card.id}
-            className={`p-4 rounded-2xl border card-spring cursor-default ${
+            to={card.link}
+            className={`p-4 rounded-2xl border card-spring cursor-pointer ${
               card.urgent ? card.activeBg : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
             }`}
           >
@@ -174,7 +181,7 @@ export const Dashboard: React.FC = () => {
                 {card.count}<span className="text-xs font-normal text-slate-400 ml-1">{card.unit}</span>
               </p>
             )}
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -196,8 +203,9 @@ export const Dashboard: React.FC = () => {
           }}
         >
           {cardsData.map((card) => (
-            <div
+            <Link
               key={card.id}
+              to={card.link}
               className={`snap-start shrink-0 w-[145px] p-4 rounded-2xl border card-spring ${
                 card.urgent ? card.activeBg : 'bg-slate-900/90 border-slate-800 text-slate-300'
               }`}
@@ -213,7 +221,7 @@ export const Dashboard: React.FC = () => {
                   {card.count}<span className="text-xs font-normal text-slate-400 ml-0.5">{card.unit}</span>
                 </p>
               )}
-            </div>
+            </Link>
           ))}
         </div>
 

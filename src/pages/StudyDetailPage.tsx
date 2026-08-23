@@ -119,10 +119,32 @@ export const StudyDetailPage: React.FC = () => {
       {/* Overview & Site Counter Card */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <Building className="w-4 h-4 text-slate-500" />
-              <span>Sponsor: <strong className="text-white">{study.sponsor || '미지정'}</strong></span>
+              <span className="text-slate-400 text-xs font-semibold">Sponsor:</span>
+              <input
+                type="text"
+                defaultValue={study.sponsor || ''}
+                onBlur={e => {
+                  const val = e.target.value.trim();
+                  if (val !== (study.sponsor || '')) updateStudy(study.id, { sponsor: val || undefined });
+                }}
+                placeholder="의뢰자명 입력"
+                className="bg-slate-800 border border-slate-700 text-white text-sm font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500 min-w-[160px]"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <span className="text-slate-400 text-xs font-semibold">Phase:</span>
+              <select
+                value={study.phase || ''}
+                onChange={e => updateStudy(study.id, { phase: e.target.value })}
+                className="bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500"
+              >
+                {['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'PMS', '기타'].map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
             </div>
           </div>
 

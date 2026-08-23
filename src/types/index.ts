@@ -3,6 +3,7 @@ export type ContactRole = 'CRA' | 'DM' | 'Safety' | 'PV' | '통계' | '의뢰자
 export type WorkType = 'CRA' | 'PL' | 'Client communication' | 'Meeting' | 'Admin' | 'IRB' | 'Monitoring' | 'Report' | '기타';
 export type TrainingStatus = '완료' | '예정' | '미수강';
 export type IssueStatus = '진행중' | '보류' | '해결';
+export type IssuePriority = 'High' | 'Medium' | 'Low';
 
 export interface Study {
   id: string;
@@ -74,6 +75,7 @@ export interface Issue {
   title: string;
   description?: string;
   category: string;
+  priority?: IssuePriority;   // High / Medium / Low
   owner?: string;
   due_date: string;
   status: IssueStatus;

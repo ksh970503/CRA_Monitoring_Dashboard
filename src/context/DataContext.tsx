@@ -19,6 +19,7 @@ interface DataContextType {
   
   // Handlers
   addWorkLog: (log: Omit<WorkLog, 'id' | 'created_at'>) => Promise<void>;
+  updateWorkLog: (id: string, updates: Partial<WorkLog>) => Promise<void>;
   deleteWorkLog: (id: string) => Promise<void>;
   
   addStudy: (study: Omit<Study, 'id' | 'created_at' | 'updated_at'>) => Promise<Study>;
@@ -261,6 +262,22 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     setWorkLogs(prev => prev.filter(w => w.id !== id));
   };
 
+  const updateWorkLog = async (id: string, updates: Partial<WorkLog>) => {
+    if (isSupabaseConfigured && !isGuest) {
+      await supabase.from('work_logs').update({
+        date: updates.date,
+        study_id: updates.study_id ?? null,
+        work_type: updates.work_type,
+        content: updates.content,
+        hours: updates.hours,
+        needs_followup: updates.needs_followup,
+        next_action: updates.next_action ?? null,
+        due_date: updates.due_date ?? null,
+      }).eq('id', id);
+    }
+    setWorkLogs(prev => prev.map(w => w.id === id ? { ...w, ...updates } : w));
+  };
+
   // Study CRUD
   const addStudy = async (studyData: Omit<Study, 'id' | 'created_at' | 'updated_at'>) => {
     const newStudy: Study = {
@@ -378,10 +395,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         title: issueData.title,
         description: issueData.description || null,
         category: issueData.category || null,
+        priority: issueData.priority || null,
         owner: issueData.owner || null,
         due_date: issueData.due_date || null,
         status: issueData.status,
-        discovered_date: issueData.discovered_date,
+        discovered_date: issueData.discovered_date || null,
         related_files: issueData.related_files || null,
         source_log_id: issueData.source_log_id || null
       }]).select('*, studies(name)').single();
@@ -510,6 +528,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         isDemoMode: isGuest || !userId,
         resetDemoData,
         addWorkLog,
+        updateWorkLog,
         deleteWorkLog,
         addStudy,
         updateStudy,

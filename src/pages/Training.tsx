@@ -216,7 +216,7 @@ export const TrainingPage: React.FC = () => {
 
                 <button
                   onClick={(e) => {
-                    e.stopPropagation();
+                    if (!window.confirm('이 교육 항목을 삭제하시겠습니까?')) return;
                     deleteTraining(t.id);
                   }}
                   className="p-2 text-slate-500 hover:text-rose-400 rounded-lg active:scale-90 transition"
@@ -294,7 +294,7 @@ export const TrainingPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <button
-                        onClick={() => deleteTraining(t.id)}
+                        onClick={() => { if (window.confirm('이 교육 항목을 삭제하시겠습니까?')) deleteTraining(t.id); }}
                         className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition active:scale-90"
                         title="삭제"
                       >
