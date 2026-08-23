@@ -288,6 +288,60 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         }
       }
 
+      // 1-1. Contacts
+      for (const c of contacts) {
+        const studyId = isUUID(c.study_id) ? c.study_id : (studyIdMap[c.study_id] || null);
+        if (isUUID(c.id)) {
+          const { error } = await supabase.from('study_contacts').upsert({
+            id: c.id,
+            user_id: userId,
+            study_id: studyId,
+            role: c.role,
+            name: c.name,
+            email: c.email || null,
+            phone: c.phone || null
+          });
+          recordResult(error);
+        } else {
+          const { error } = await supabase.from('study_contacts').insert([{
+            user_id: userId,
+            study_id: studyId,
+            role: c.role,
+            name: c.name,
+            email: c.email || null,
+            phone: c.phone || null
+          }]);
+          recordResult(error);
+        }
+      }
+
+      // 1-2. Milestones
+      for (const m of milestones) {
+        const studyId = isUUID(m.study_id) ? m.study_id : (studyIdMap[m.study_id] || null);
+        if (isUUID(m.id)) {
+          const { error } = await supabase.from('study_milestones').upsert({
+            id: m.id,
+            user_id: userId,
+            study_id: studyId,
+            title: m.title,
+            done: m.done,
+            done_date: m.done_date || null,
+            sort_order: m.sort_order || 0
+          });
+          recordResult(error);
+        } else {
+          const { error } = await supabase.from('study_milestones').insert([{
+            user_id: userId,
+            study_id: studyId,
+            title: m.title,
+            done: m.done,
+            done_date: m.done_date || null,
+            sort_order: m.sort_order || 0
+          }]);
+          recordResult(error);
+        }
+      }
+
       // 2. WorkLogs
       for (const w of workLogs) {
         const studyId = isUUID(w.study_id) ? w.study_id : (studyIdMap[w.study_id || ''] || null);
@@ -721,7 +775,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   const addContact = async (contactData: Omit<StudyContact, 'id'>) => {
     const newContact: StudyContact = { ...contactData, id: 'c-' + Date.now() };
     if (isSupabaseConfigured && !isGuest && userId) {
-      const insertData = { ...contactData, user_id: userId, study_id: isUUID(contactData.study_id) ? contactData.study_id : null };
+      const insertData = {
+        user_id: userId,
+        study_id: isUUID(contactData.study_id) ? contactData.study_id : null,
+        role: contactData.role,
+        name: contactData.name,
+        email: contactData.email || null,
+        phone: contactData.phone || null
+      };
       const { data, error } = await supabase.from('study_contacts').insert([insertData]).select().single();
       handleSupabaseError(error, '담당자 추가');
       if (data) newContact.id = data.id;
@@ -754,7 +815,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   const addMilestone = async (m: Omit<StudyMilestone, 'id'>) => {
     const newM: StudyMilestone = { ...m, id: 'm-' + Date.now() };
     if (isSupabaseConfigured && !isGuest && userId) {
-      const insertData = { ...m, user_id: userId, study_id: isUUID(m.study_id) ? m.study_id : null };
+      const insertData = {
+        user_id: userId,
+        study_id: isUUID(m.study_id) ? m.study_id : null,
+        title: m.title,
+        done: m.done,
+        done_date: m.done_date || null,
+        sort_order: m.sort_order || 0
+      };
       const { data, error } = await supabase.from('study_milestones').insert([insertData]).select().single();
       handleSupabaseError(error, '마일스톤 추가');
       if (data) newM.id = data.id;
