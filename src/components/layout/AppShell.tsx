@@ -1,15 +1,21 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
-import { Stethoscope, LogOut, RefreshCw, LogIn, Sparkles } from 'lucide-react';
+import { Stethoscope, LogOut, RefreshCw, LogIn, Sparkles, CloudUpload } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, signOut, guestUser } = useAuth();
-  const { isDemoMode, resetDemoData } = useData();
+  const { isDemoMode, resetDemoData, syncAllToSupabase, isSyncing } = useData();
 
   const showDemoBanner = guestUser || isDemoMode || !user;
+
+  const handleSync = async () => {
+    const res = await syncAllToSupabase();
+    alert(res.message);
+  };
 
   return (
     <div className="min-h-screen flex bg-slate-900 md:bg-slate-950 font-sans text-slate-100 antialiased">
@@ -64,13 +70,26 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               )}
             </div>
           </div>
-          <button
-            onClick={signOut}
-            className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg"
-            title="로그아웃 / 로그인 화면"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {user && !guestUser && isSupabaseConfigured && (
+              <button
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="px-2.5 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
+                title="Supabase 서버에 데이터 저장"
+              >
+                <CloudUpload className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? '저장 중...' : '서버 저장'}</span>
+              </button>
+            )}
+            <button
+              onClick={signOut}
+              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg"
+              title="로그아웃 / 로그인 화면"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </header>
 
         {/* Content Container */}

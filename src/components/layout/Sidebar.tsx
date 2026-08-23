@@ -2,11 +2,18 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { NAV_ITEMS } from './navItems';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, Stethoscope, Wifi, WifiOff } from 'lucide-react';
+import { useData } from '../../context/DataContext';
+import { LogOut, Stethoscope, Wifi, WifiOff, CloudUpload } from 'lucide-react';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 export const Sidebar: React.FC = () => {
   const { user, signOut, guestUser } = useAuth();
+  const { syncAllToSupabase, isSyncing } = useData();
+
+  const handleSync = async () => {
+    const res = await syncAllToSupabase();
+    alert(res.message);
+  };
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-slate-900 text-white min-h-screen p-4 border-r border-slate-800 shrink-0 select-none">
@@ -22,7 +29,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Connection Mode Status Badge */}
-      <div className="px-3 mb-6">
+      <div className="px-3 mb-4">
         <div className={`px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 ${
           isSupabaseConfigured 
             ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' 
@@ -40,6 +47,20 @@ export const Sidebar: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Manual Server Save / Sync Button for Logged in Google Users */}
+      {user && !guestUser && isSupabaseConfigured && (
+        <div className="px-3 mb-4">
+          <button
+            onClick={handleSync}
+            disabled={isSyncing}
+            className="w-full px-3 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition duration-200 active:scale-[0.98] disabled:opacity-50"
+          >
+            <CloudUpload className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? '서버에 저장 중...' : '데이터 서버 저장 (Sync)'}</span>
+          </button>
+        </div>
+      )}
 
       {/* Nav Menu */}
       <nav className="flex-1 space-y-1.5">
