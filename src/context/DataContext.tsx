@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Study, WorkLog, Training, Issue, WaitingItem, StudyContact, StudyMilestone, DashboardSummary } from '../types';
 import { MOCK_STUDIES, MOCK_CONTACTS, MOCK_MILESTONES, MOCK_WORK_LOGS, MOCK_TRAININGS, MOCK_ISSUES, MOCK_WAITING } from '../lib/mockData';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -48,17 +48,23 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  STUDIES: 'cra_monitoring_studies',
-  CONTACTS: 'cra_monitoring_contacts',
-  MILESTONES: 'cra_monitoring_milestones',
-  WORK_LOGS: 'cra_monitoring_work_logs',
-  TRAININGS: 'cra_monitoring_trainings',
-  ISSUES: 'cra_monitoring_issues',
-  WAITING: 'cra_monitoring_waiting',
-};
+const getStorageKeys = (prefix: string) => ({
+  STUDIES: `${prefix}_cra_monitoring_studies`,
+  CONTACTS: `${prefix}_cra_monitoring_contacts`,
+  MILESTONES: `${prefix}_cra_monitoring_milestones`,
+  WORK_LOGS: `${prefix}_cra_monitoring_work_logs`,
+  TRAININGS: `${prefix}_cra_monitoring_trainings`,
+  ISSUES: `${prefix}_cra_monitoring_issues`,
+  WAITING: `${prefix}_cra_monitoring_waiting`,
+});
 
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface DataProviderProps {
+  children: React.ReactNode;
+  userId?: string | null;   // null/undefined = guest (demo) mode
+  isGuest?: boolean;
+}
+
+export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, isGuest = false }) => {
   const [studies, setStudies] = useState<Study[]>([]);
   const [contacts, setContacts] = useState<StudyContact[]>([]);
   const [milestones, setMilestones] = useState<StudyMilestone[]>([]);
@@ -67,10 +73,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [issues, setIssues] = useState<Issue[]>([]);
   const [waitingItems, setWaitingItems] = useState<WaitingItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const isGuest = localStorage.getItem('cra_guest_session') === 'true';
+
+  // localStorage 키 prefix: 로그인 유저는 userId, 데모는 'guest'
+  const storagePrefix = userId ? `user_${userId}` : 'guest';
 
   // Helper to load sample mock data into state
-  const loadMockData = () => {
+  const loadMockData = useCallback((keys: ReturnType<typeof getStorageKeys>) => {
     setStudies(MOCK_STUDIES);
     setContacts(MOCK_CONTACTS);
     setMilestones(MOCK_MILESTONES);
@@ -79,41 +87,44 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIssues(MOCK_ISSUES);
     setWaitingItems(MOCK_WAITING);
 
-    localStorage.setItem(STORAGE_KEYS.STUDIES, JSON.stringify(MOCK_STUDIES));
-    localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(MOCK_CONTACTS));
-    localStorage.setItem(STORAGE_KEYS.MILESTONES, JSON.stringify(MOCK_MILESTONES));
-    localStorage.setItem(STORAGE_KEYS.WORK_LOGS, JSON.stringify(MOCK_WORK_LOGS));
-    localStorage.setItem(STORAGE_KEYS.TRAININGS, JSON.stringify(MOCK_TRAININGS));
-    localStorage.setItem(STORAGE_KEYS.ISSUES, JSON.stringify(MOCK_ISSUES));
-    localStorage.setItem(STORAGE_KEYS.WAITING, JSON.stringify(MOCK_WAITING));
-  };
+    localStorage.setItem(keys.STUDIES, JSON.stringify(MOCK_STUDIES));
+    localStorage.setItem(keys.CONTACTS, JSON.stringify(MOCK_CONTACTS));
+    localStorage.setItem(keys.MILESTONES, JSON.stringify(MOCK_MILESTONES));
+    localStorage.setItem(keys.WORK_LOGS, JSON.stringify(MOCK_WORK_LOGS));
+    localStorage.setItem(keys.TRAININGS, JSON.stringify(MOCK_TRAININGS));
+    localStorage.setItem(keys.ISSUES, JSON.stringify(MOCK_ISSUES));
+    localStorage.setItem(keys.WAITING, JSON.stringify(MOCK_WAITING));
+  }, []);
 
   // Reset/restore sample data manually
-  const resetDemoData = () => {
-    localStorage.removeItem(STORAGE_KEYS.STUDIES);
-    localStorage.removeItem(STORAGE_KEYS.CONTACTS);
-    localStorage.removeItem(STORAGE_KEYS.MILESTONES);
-    localStorage.removeItem(STORAGE_KEYS.WORK_LOGS);
-    localStorage.removeItem(STORAGE_KEYS.TRAININGS);
-    localStorage.removeItem(STORAGE_KEYS.ISSUES);
-    localStorage.removeItem(STORAGE_KEYS.WAITING);
-    loadMockData();
-  };
+  const resetDemoData = useCallback(() => {
+    const keys = getStorageKeys(storagePrefix);
+    localStorage.removeItem(keys.STUDIES);
+    localStorage.removeItem(keys.CONTACTS);
+    localStorage.removeItem(keys.MILESTONES);
+    localStorage.removeItem(keys.WORK_LOGS);
+    localStorage.removeItem(keys.TRAININGS);
+    localStorage.removeItem(keys.ISSUES);
+    localStorage.removeItem(keys.WAITING);
+    loadMockData(keys);
+  }, [storagePrefix, loadMockData]);
 
   // Initialize data from Supabase or localStorage/Mock
+  // userId 변경 시 재로드 (로그인/로그아웃/유저 전환)
   useEffect(() => {
+    const keys = getStorageKeys(storagePrefix);
+
     async function loadData() {
       setLoading(true);
-      const isGuestSession = localStorage.getItem('cra_guest_session') === 'true';
 
-      // Always load mock/sample data in Guest/Demo session
-      if (isGuestSession || !isSupabaseConfigured) {
-        loadFromLocalOrMock();
+      // 데모(게스트) 모드: mock 데이터(localStorage)에서 로드
+      if (isGuest || !isSupabaseConfigured || !userId) {
+        loadFromLocalOrMock(keys);
         setLoading(false);
         return;
       }
 
-      // If Supabase is connected and user is logged in
+      // Supabase 연결 + 로그인 유저: DB에서 로드
       try {
         const [sRes, cRes, mRes, wRes, tRes, iRes, wtRes] = await Promise.all([
           supabase.from('studies').select('*').order('created_at', { ascending: false }),
@@ -134,56 +145,70 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (iRes.data) setIssues(iRes.data);
           if (wtRes.data) setWaitingItems(wtRes.data);
         } else {
-          // If logged in Supabase user has no data yet, provide initial sample data
-          loadFromLocalOrMock();
+          // 이 유저의 DB 데이터가 없으면 → 해당 유저 localStorage 확인 후 빈 상태로 시작
+          loadFromLocalOrMock(keys);
         }
 
       } catch (err) {
-        console.warn('Supabase fetch failed, falling back to mock data:', err);
-        loadFromLocalOrMock();
+        console.warn('Supabase fetch failed, falling back to local/mock data:', err);
+        loadFromLocalOrMock(keys);
       }
       setLoading(false);
     }
 
-    function loadFromLocalOrMock() {
-      const getLocal = <T,>(key: string, mock: T): T => {
+    function loadFromLocalOrMock(k: ReturnType<typeof getStorageKeys>) {
+      const getLocal = <T,>(key: string, fallback: T): T => {
         const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : mock;
+        return item ? JSON.parse(item) : fallback;
       };
 
-      const loadedStudies = getLocal(STORAGE_KEYS.STUDIES, MOCK_STUDIES);
-      const loadedWorkLogs = getLocal(STORAGE_KEYS.WORK_LOGS, MOCK_WORK_LOGS);
+      const loadedStudies = getLocal(k.STUDIES, null as unknown as Study[]);
 
-      // If local storage is empty or cleared, force mock sample data
+      // 해당 prefix의 localStorage가 비어 있으면:
+      // - 게스트 모드: mock 데이터 로드
+      // - 로그인 유저: 빈 상태(새 유저)로 시작
       if (!loadedStudies || loadedStudies.length === 0) {
-        loadMockData();
+        if (isGuest) {
+          loadMockData(k);
+        } else {
+          // 신규 로그인 유저 - 빈 상태
+          setStudies([]);
+          setContacts([]);
+          setMilestones([]);
+          setWorkLogs([]);
+          setTrainings([]);
+          setIssues([]);
+          setWaitingItems([]);
+        }
         return;
       }
 
+      const emptyArr: never[] = [];
       setStudies(loadedStudies);
-      setContacts(getLocal(STORAGE_KEYS.CONTACTS, MOCK_CONTACTS));
-      setMilestones(getLocal(STORAGE_KEYS.MILESTONES, MOCK_MILESTONES));
-      setWorkLogs(loadedWorkLogs);
-      setTrainings(getLocal(STORAGE_KEYS.TRAININGS, MOCK_TRAININGS));
-      setIssues(getLocal(STORAGE_KEYS.ISSUES, MOCK_ISSUES));
-      setWaitingItems(getLocal(STORAGE_KEYS.WAITING, MOCK_WAITING));
+      setContacts(getLocal(k.CONTACTS, emptyArr));
+      setMilestones(getLocal(k.MILESTONES, emptyArr));
+      setWorkLogs(getLocal(k.WORK_LOGS, emptyArr));
+      setTrainings(getLocal(k.TRAININGS, emptyArr));
+      setIssues(getLocal(k.ISSUES, emptyArr));
+      setWaitingItems(getLocal(k.WAITING, emptyArr));
     }
 
     loadData();
-  }, []);
+  }, [userId, isGuest, storagePrefix, loadMockData]);
 
-  // Sync to localStorage for Guest/Offline
+  // Sync to localStorage (유저별 prefix로 저장)
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(STORAGE_KEYS.STUDIES, JSON.stringify(studies));
-      localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(contacts));
-      localStorage.setItem(STORAGE_KEYS.MILESTONES, JSON.stringify(milestones));
-      localStorage.setItem(STORAGE_KEYS.WORK_LOGS, JSON.stringify(workLogs));
-      localStorage.setItem(STORAGE_KEYS.TRAININGS, JSON.stringify(trainings));
-      localStorage.setItem(STORAGE_KEYS.ISSUES, JSON.stringify(issues));
-      localStorage.setItem(STORAGE_KEYS.WAITING, JSON.stringify(waitingItems));
+      const keys = getStorageKeys(storagePrefix);
+      localStorage.setItem(keys.STUDIES, JSON.stringify(studies));
+      localStorage.setItem(keys.CONTACTS, JSON.stringify(contacts));
+      localStorage.setItem(keys.MILESTONES, JSON.stringify(milestones));
+      localStorage.setItem(keys.WORK_LOGS, JSON.stringify(workLogs));
+      localStorage.setItem(keys.TRAININGS, JSON.stringify(trainings));
+      localStorage.setItem(keys.ISSUES, JSON.stringify(issues));
+      localStorage.setItem(keys.WAITING, JSON.stringify(waitingItems));
     }
-  }, [studies, contacts, milestones, workLogs, trainings, issues, waitingItems, loading]);
+  }, [studies, contacts, milestones, workLogs, trainings, issues, waitingItems, loading, storagePrefix]);
 
   // WorkLog Add + Auto Issue creation
   const addWorkLog = async (logData: Omit<WorkLog, 'id' | 'created_at'>) => {
@@ -482,7 +507,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         waitingItems,
         loading,
         isOnline: isSupabaseConfigured,
-        isDemoMode: isGuest,
+        isDemoMode: isGuest || !userId,
         resetDemoData,
         addWorkLog,
         deleteWorkLog,

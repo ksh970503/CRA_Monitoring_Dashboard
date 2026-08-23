@@ -33,35 +33,44 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+// DataProvider를 AuthContext 하위에서 사용하기 위한 래퍼
+// userId가 바뀌면(로그인/로그아웃/계정 전환) DataProvider가 해당 유저의 데이터를 로드합니다.
+const AppWithData: React.FC = () => {
+  const { user, guestUser } = useAuth();
+
+  return (
+    <DataProvider userId={user?.id ?? null} isGuest={guestUser}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/worklog" element={<WorkLogPage />} />
+                  <Route path="/training" element={<Navigate to="/trainings" replace />} />
+                  <Route path="/trainings" element={<TrainingPage />} />
+                  <Route path="/studies" element={<StudiesPage />} />
+                  <Route path="/studies/:id" element={<StudyDetailPage />} />
+                  <Route path="/issues" element={<IssuesPage />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </DataProvider>
+  );
+};
+
 export function App() {
   return (
     <Router>
       <AuthProvider>
-        <DataProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            
-            <Route
-              path="/*"
-              element={
-                <ProtectedRoute>
-                  <AppShell>
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/worklog" element={<WorkLogPage />} />
-                      <Route path="/training" element={<Navigate to="/trainings" replace />} />
-                      <Route path="/trainings" element={<TrainingPage />} />
-                      <Route path="/studies" element={<StudiesPage />} />
-                      <Route path="/studies/:id" element={<StudyDetailPage />} />
-                      <Route path="/issues" element={<IssuesPage />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </AppShell>
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </DataProvider>
+        <AppWithData />
       </AuthProvider>
     </Router>
   );
