@@ -83,6 +83,15 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const handleSupabaseError = (error: any, actionDesc: string) => {
+    if (error) {
+      console.error(`${actionDesc} Supabase Error:`, error);
+      alert(`[서버 동기화 오류] ${actionDesc} 실패: ${error.message}\n데이터는 기기에 임시 저장되었습니다. 상단 '서버 저장' 버튼을 눌러 동기화해주세요.`);
+      return true;
+    }
+    return false;
+  };
+
   // localStorage 키 prefix: 로그인 유저는 userId, 데모는 'guest'
   const storagePrefix = userId ? `user_${userId}` : 'guest';
 
@@ -234,12 +243,25 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       return { success: false, message: 'Supabase 로그인 상태가 아닙니다.' };
     }
     setIsSyncing(true);
+    let successCount = 0;
+    let failCount = 0;
+    let lastError: any = null;
+
+    const recordResult = (error: any) => {
+      if (error) {
+        failCount++;
+        lastError = error;
+      } else {
+        successCount++;
+      }
+    };
+
     try {
       // 1. Studies
       const studyIdMap: Record<string, string> = {};
       for (const s of studies) {
         if (isUUID(s.id)) {
-          await supabase.from('studies').upsert({
+          const { error } = await supabase.from('studies').upsert({
             id: s.id,
             user_id: userId,
             name: s.name,
@@ -249,9 +271,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             site_total: s.site_total,
             site_closed: s.site_closed
           });
+          recordResult(error);
           studyIdMap[s.id] = s.id;
         } else {
-          const { data } = await supabase.from('studies').insert([{
+          const { data, error } = await supabase.from('studies').insert([{
             user_id: userId,
             name: s.name,
             sponsor: s.sponsor || null,
@@ -260,6 +283,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             site_total: s.site_total,
             site_closed: s.site_closed
           }]).select().single();
+          recordResult(error);
           if (data) studyIdMap[s.id] = data.id;
         }
       }
@@ -268,7 +292,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       for (const w of workLogs) {
         const studyId = isUUID(w.study_id) ? w.study_id : (studyIdMap[w.study_id || ''] || null);
         if (isUUID(w.id)) {
-          await supabase.from('work_logs').upsert({
+          const { error } = await supabase.from('work_logs').upsert({
             id: w.id,
             user_id: userId,
             date: w.date,
@@ -280,8 +304,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             next_action: w.next_action || null,
             due_date: w.due_date || null
           });
+          recordResult(error);
         } else {
-          await supabase.from('work_logs').insert([{
+          const { error } = await supabase.from('work_logs').insert([{
             user_id: userId,
             date: w.date,
             study_id: studyId,
@@ -292,6 +317,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             next_action: w.next_action || null,
             due_date: w.due_date || null
           }]);
+          recordResult(error);
         }
       }
 
@@ -299,7 +325,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       for (const i of issues) {
         const studyId = isUUID(i.study_id) ? i.study_id : (studyIdMap[i.study_id || ''] || null);
         if (isUUID(i.id)) {
-          await supabase.from('issues').upsert({
+          const { error } = await supabase.from('issues').upsert({
             id: i.id,
             user_id: userId,
             study_id: studyId,
@@ -313,8 +339,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             discovered_date: i.discovered_date || null,
             related_files: i.related_files || null
           });
+          recordResult(error);
         } else {
-          await supabase.from('issues').insert([{
+          const { error } = await supabase.from('issues').insert([{
             user_id: userId,
             study_id: studyId,
             title: i.title,
@@ -327,13 +354,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             discovered_date: i.discovered_date || null,
             related_files: i.related_files || null
           }]);
+          recordResult(error);
         }
       }
 
       // 4. Trainings
       for (const t of trainings) {
         if (isUUID(t.id)) {
-          await supabase.from('trainings').upsert({
+          const { error } = await supabase.from('trainings').upsert({
             id: t.id,
             user_id: userId,
             name: t.name,
@@ -342,8 +370,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             link: t.link || null,
             completed_date: t.completed_date || null
           });
+          recordResult(error);
         } else {
-          await supabase.from('trainings').insert([{
+          const { error } = await supabase.from('trainings').insert([{
             user_id: userId,
             name: t.name,
             status: t.status,
@@ -351,6 +380,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             link: t.link || null,
             completed_date: t.completed_date || null
           }]);
+          recordResult(error);
         }
       }
 
@@ -358,7 +388,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       for (const wt of waitingItems) {
         const studyId = isUUID(wt.study_id) ? wt.study_id : (studyIdMap[wt.study_id || ''] || null);
         if (isUUID(wt.id)) {
-          await supabase.from('waiting_items').upsert({
+          const { error } = await supabase.from('waiting_items').upsert({
             id: wt.id,
             user_id: userId,
             study_id: studyId,
@@ -367,8 +397,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             created_date: wt.created_date,
             resolved: wt.resolved
           });
+          recordResult(error);
         } else {
-          await supabase.from('waiting_items').insert([{
+          const { error } = await supabase.from('waiting_items').insert([{
             user_id: userId,
             study_id: studyId,
             title: wt.title,
@@ -376,15 +407,22 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
             created_date: wt.created_date,
             resolved: wt.resolved
           }]);
+          recordResult(error);
         }
       }
 
       setIsSyncing(false);
-      return { success: true, message: '모든 데이터가 Supabase 서버에 안전하게 저장되었습니다!' };
+      
+      if (failCount > 0) {
+        console.error('syncAllToSupabase Error:', lastError);
+        return { success: false, message: `⚠️ ${failCount}건 저장 실패: ${lastError?.message || '알 수 없는 오류'} (다시 시도해주세요)` };
+      }
+      return { success: true, message: `✅ 서버 저장 성공 (동기화 ${successCount}건 완료)` };
+
     } catch (err: any) {
       setIsSyncing(false);
-      console.error('syncAllToSupabase Error:', err);
-      return { success: false, message: '저장 중 오류 발생: ' + (err?.message || err) };
+      console.error('syncAllToSupabase Exception:', err);
+      return { success: false, message: '저장 중 예기치 않은 예외 발생: ' + (err?.message || err) };
     }
   };
 
@@ -395,14 +433,30 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     async function loadData() {
       setLoading(true);
 
-      // 데모(게스트) 모드: mock 데이터(localStorage)에서 로드
+      // 데모(게스트) 모드 또는 Supabase 미설정시: mock 데이터(localStorage)에서 로드
       if (isGuest || !isSupabaseConfigured || !userId) {
         loadFromLocalOrMock(keys);
         setLoading(false);
         return;
       }
 
-      // Supabase 연결 + 로그인 유저: DB에서 독립적으로 로드
+      // Supabase 세션 가드 (Auth Race Condition 방지)
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session || session.user.id !== userId) {
+          console.warn('Supabase session not fully ready or mismatch. Falling back to local data.');
+          loadFromLocalOrMock(keys, true); // true = safeguard (do not wipe)
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn('Session check failed:', e);
+        loadFromLocalOrMock(keys, true);
+        setLoading(false);
+        return;
+      }
+
+      // Supabase 연결 + 로그인 유저: DB에서 로드
       try {
         const [sRes, cRes, mRes, wRes, tRes, iRes, wtRes] = await Promise.all([
           supabase.from('studies').select('*').order('created_at', { ascending: false }),
@@ -413,6 +467,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           supabase.from('issues').select('*, studies(name)').order('due_date'),
           supabase.from('waiting_items').select('*, studies(name), issues(title)'),
         ]);
+
+        if (sRes.error) throw sRes.error;
 
         const totalCount = (sRes.data?.length || 0) + (wRes.data?.length || 0) + (tRes.data?.length || 0) + (iRes.data?.length || 0);
 
@@ -436,7 +492,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           setIssues(iRes2.data || []);
           setWaitingItems(wtRes2.data || []);
         } else {
-          // 테이블별 독립 반영
+          // 스마트 병합 (Supabase 데이터 + 로컬에만 있는 미동기화 데이터)를 할 수도 있지만, 
+          // 기본적인 단일 진실 공급원(SSOT)을 Supabase로 강제하되, 오프라인 작성분 로컬 데이터 보존을 위해
+          // 여기서는 Supabase 조회 데이터를 덮어씁니다. 단, 오류 상황이 아님이 보장됨.
           setStudies(sRes.data || []);
           setContacts(cRes.data || []);
           setMilestones(mRes.data || []);
@@ -447,13 +505,13 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         }
 
       } catch (err) {
-        console.warn('Supabase fetch failed, falling back to local data:', err);
-        loadFromLocalOrMock(keys);
+        console.warn('Supabase fetch failed, falling back to local data gracefully:', err);
+        loadFromLocalOrMock(keys, true); // safeguard enabled
       }
       setLoading(false);
     }
 
-    function loadFromLocalOrMock(k: ReturnType<typeof getStorageKeys>) {
+    function loadFromLocalOrMock(k: ReturnType<typeof getStorageKeys>, safeguard: boolean = false) {
       const getLocal = <T,>(key: string, fallback: T): T => {
         const item = localStorage.getItem(key);
         return item ? JSON.parse(item) : fallback;
@@ -461,10 +519,12 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
 
       const loadedStudies = getLocal(k.STUDIES, null as unknown as Study[]);
 
+      // 如果 safeguard가 true이면, 로컬 데이터가 로드되지 않았다고 해서 상태를 비우면 안 됩니다.
       if (!loadedStudies || loadedStudies.length === 0) {
         if (isGuest) {
           loadMockData(k);
-        } else {
+        } else if (!safeguard) {
+          // safeguard가 아닐 때만 초기화 (신규 유저)
           setStudies([]);
           setContacts([]);
           setMilestones([]);
@@ -525,7 +585,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         due_date: logData.due_date || null
       }]).select('*, studies(name)').single();
       
-      if (error) console.error('addWorkLog Supabase Error:', error);
+      handleSupabaseError(error, '업무일지 추가');
       if (!error && data) {
         newLog.id = data.id;
       }
@@ -569,7 +629,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           next_action: updates.next_action ?? null,
           due_date: updates.due_date ?? null,
         }).eq('id', id);
-        if (error) console.error('updateWorkLog Supabase Update Error:', error);
+        handleSupabaseError(error, '업무일지 수정(업데이트)');
       } else {
         // non-UUID (legacy string ID): insert as new row into Supabase
         const { data, error } = await supabase.from('work_logs').insert([{
@@ -583,7 +643,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           next_action: updates.next_action ?? null,
           due_date: updates.due_date ?? null,
         }]).select('*, studies(name)').single();
-        if (error) console.error('updateWorkLog Supabase Insert Error:', error);
+        handleSupabaseError(error, '업무일지 수정(신규 삽입)');
         if (data) updates.id = data.id;
       }
     }
@@ -602,7 +662,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         user_id: userId,
         ...studyData
       }]).select().single();
-      if (error) console.error('addStudy Supabase Error:', error);
+      handleSupabaseError(error, '과제 추가');
       if (data) newStudy.id = data.id;
     }
     setStudies(prev => [newStudy, ...prev]);
@@ -612,7 +672,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   const updateStudy = async (id: string, updates: Partial<Study>) => {
     if (isSupabaseConfigured && !isGuest && isUUID(id)) {
       const { error } = await supabase.from('studies').update(updates).eq('id', id);
-      if (error) console.error('updateStudy Supabase Error:', error);
+      handleSupabaseError(error, '과제 수정');
     }
     setStudies(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
@@ -630,7 +690,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     if (isSupabaseConfigured && !isGuest && userId) {
       const insertData = { ...contactData, user_id: userId, study_id: isUUID(contactData.study_id) ? contactData.study_id : null };
       const { data, error } = await supabase.from('study_contacts').insert([insertData]).select().single();
-      if (error) console.error('addContact Supabase Error:', error);
+      handleSupabaseError(error, '담당자 추가');
       if (data) newContact.id = data.id;
     }
     setContacts(prev => [...prev, newContact]);
@@ -663,7 +723,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     if (isSupabaseConfigured && !isGuest && userId) {
       const insertData = { ...m, user_id: userId, study_id: isUUID(m.study_id) ? m.study_id : null };
       const { data, error } = await supabase.from('study_milestones').insert([insertData]).select().single();
-      if (error) console.error('addMilestone Supabase Error:', error);
+      handleSupabaseError(error, '마일스톤 추가');
       if (data) newM.id = data.id;
     }
     setMilestones(prev => [...prev, newM]);
@@ -684,7 +744,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         user_id: userId,
         ...t
       }]).select().single();
-      if (error) console.error('addTraining Supabase Error:', error);
+      handleSupabaseError(error, '교육 추가');
       if (data) newT.id = data.id;
     }
     setTrainings(prev => [newT, ...prev]);
@@ -693,7 +753,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   const updateTraining = async (id: string, updates: Partial<Training>) => {
     if (isSupabaseConfigured && !isGuest && isUUID(id)) {
       const { error } = await supabase.from('trainings').update(updates).eq('id', id);
-      if (error) console.error('updateTraining Supabase Error:', error);
+      handleSupabaseError(error, '교육 수정');
     }
     setTrainings(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
   };
@@ -730,7 +790,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         related_files: issueData.related_files || null,
         source_log_id: isUUID(issueData.source_log_id) ? issueData.source_log_id : null
       }]).select('*, studies(name)').single();
-      if (error) console.error('addIssue Supabase Error:', error);
+      handleSupabaseError(error, '이슈 추가');
       if (data) newIssue.id = data.id;
     }
 
@@ -754,7 +814,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           related_files: patch.related_files,
           last_updated: patch.last_updated
         }).eq('id', id);
-        if (error) console.error('updateIssue Supabase Update Error:', error);
+        handleSupabaseError(error, '이슈 수정(업데이트)');
       } else {
         // non-UUID legacy string: insert into Supabase
         const { data, error } = await supabase.from('issues').insert([{
@@ -771,7 +831,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
           related_files: patch.related_files || null,
           source_log_id: isUUID(patch.source_log_id) ? patch.source_log_id : null
         }]).select('*, studies(name)').single();
-        if (error) console.error('updateIssue Supabase Insert Error:', error);
+        handleSupabaseError(error, '이슈 수정(신규 삽입)');
         if (data) patch.id = data.id;
       }
     }
@@ -804,7 +864,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
         created_date: item.created_date,
         resolved: false
       }]).select('*, studies(name)').single();
-      if (error) console.error('addWaitingItem Supabase Error:', error);
+      handleSupabaseError(error, '대기 항목 추가');
       if (data) newItem.id = data.id;
     }
 
