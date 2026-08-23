@@ -544,39 +544,13 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
 
         if (sRes.error) throw sRes.error;
 
-        const totalCount = (sRes.data?.length || 0) + (wRes.data?.length || 0) + (tRes.data?.length || 0) + (iRes.data?.length || 0);
-
-        // 최초 구글 로그인으로 Supabase에 아무 데이터도 없으면 -> 자동 시딩 후 재로드
-        if (totalCount === 0) {
-          await seedUserDataToSupabase();
-          const [sRes2, cRes2, mRes2, wRes2, tRes2, iRes2, wtRes2] = await Promise.all([
-            supabase.from('studies').select('*').order('created_at', { ascending: false }),
-            supabase.from('study_contacts').select('*'),
-            supabase.from('study_milestones').select('*').order('sort_order'),
-            supabase.from('work_logs').select('*, studies(name)').order('date', { ascending: false }),
-            supabase.from('trainings').select('*').order('due_date'),
-            supabase.from('issues').select('*, studies(name)').order('due_date'),
-            supabase.from('waiting_items').select('*, studies(name), issues(title)'),
-          ]);
-          setStudies(sRes2.data || []);
-          setContacts(cRes2.data || []);
-          setMilestones(mRes2.data || []);
-          setWorkLogs(wRes2.data || []);
-          setTrainings(tRes2.data || []);
-          setIssues(iRes2.data || []);
-          setWaitingItems(wtRes2.data || []);
-        } else {
-          // 스마트 병합 (Supabase 데이터 + 로컬에만 있는 미동기화 데이터)를 할 수도 있지만, 
-          // 기본적인 단일 진실 공급원(SSOT)을 Supabase로 강제하되, 오프라인 작성분 로컬 데이터 보존을 위해
-          // 여기서는 Supabase 조회 데이터를 덮어씁니다. 단, 오류 상황이 아님이 보장됨.
-          setStudies(sRes.data || []);
-          setContacts(cRes.data || []);
-          setMilestones(mRes.data || []);
-          setWorkLogs(wRes.data || []);
-          setTrainings(tRes.data || []);
-          setIssues(iRes.data || []);
-          setWaitingItems(wtRes.data || []);
-        }
+        setStudies(sRes.data || []);
+        setContacts(cRes.data || []);
+        setMilestones(mRes.data || []);
+        setWorkLogs(wRes.data || []);
+        setTrainings(tRes.data || []);
+        setIssues(iRes.data || []);
+        setWaitingItems(wtRes.data || []);
 
       } catch (err) {
         console.warn('Supabase fetch failed, falling back to local data gracefully:', err);
