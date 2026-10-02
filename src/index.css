@@ -1,31 +1,32 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v3.2.1/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
 @layer base {
   body {
-    background-color: #020617; /* slate-950 */
-    color: #f8fafc; /* slate-50 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+    background-color: #F2F4F6; /* Toss light gray background */
+    color: #191F28; /* Toss dark gray text */
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Custom scrollbar for dark mode */
+/* Custom scrollbar for modern light mode */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #D1D6DB;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #B0B8C1;
 }
 
 /* Hide scrollbar for clean horizontal snap scroll on mobile */

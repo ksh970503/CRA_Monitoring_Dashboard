@@ -33,22 +33,22 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl space-y-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8">
+      <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-4 sm:p-8 shadow-2xl space-y-6">
         
         {/* App Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-xl shadow-blue-500/20">
-            <Heart className="w-9 h-9 text-white fill-white" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-[0_2px_20px_rgba(0,0,0,0.04)] shadow-blue-500/20">
+            <Heart className="w-9 h-9 text-gray-900 fill-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">CRA / PL 업무관리</h1>
-            <p className="text-sm text-slate-400 mt-1">임상시험 일정 & Outstanding Issue 모니터링</p>
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">CRA / PL 업무관리</h1>
+            <p className="text-sm text-gray-500 mt-1">임상시험 일정 & Outstanding Issue 모니터링</p>
           </div>
         </div>
 
         {/* Feature Highlights */}
-        <div className="bg-slate-800/50 rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-slate-800 text-xs text-slate-300">
+        <div className="bg-gray-100 rounded-2xl p-3.5 sm:p-4 space-y-2.5 border border-gray-100 text-xs text-gray-700">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>오늘 / 3일 내 마감 임박 항목 자동 알림</span>
@@ -67,7 +67,7 @@ export const Login: React.FC = () => {
         <div className="space-y-3">
           <button
             onClick={signInWithGoogle}
-            className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 transition active:scale-[0.99]"
+            className="w-full py-3.5 px-4 bg-blue-600 hover:-white font-semibold rounded-xl shadow-sm shadow-blue-600/30 flex items-center justify-center gap-3 transition active:scale-[0.99]"
           >
             <svg className="w-5 h-5 bg-white rounded-full p-0.5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -80,7 +80,7 @@ export const Login: React.FC = () => {
 
           <button
             onClick={handleGuestLogin}
-            className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm active:scale-[0.98]"
+            className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-200 flex items-center justify-center gap-2 transition text-sm active:scale-[0.98]"
           >
             <span>활용 예시 (데모 모드)</span>
             <ArrowRight className="w-4 h-4" />
@@ -88,32 +88,32 @@ export const Login: React.FC = () => {
         </div>
 
         {/* 📱 PWA App Installation Guide Accordion */}
-        <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 transition-all duration-200">
+        <div className="border border-gray-100 rounded-2xl overflow-hidden bg-gray-50 transition-all duration-200">
           <button
             onClick={() => setShowPwaGuide(!showPwaGuide)}
-            className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-slate-900/60 transition gap-2"
+            className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-white/60 transition gap-2"
           >
             <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-300 min-w-0">
               <Smartphone className="w-4 h-4 text-indigo-400 shrink-0" />
               <span className="truncate break-keep">📱 앱으로 사용하기 (가이드)</span>
             </div>
             {showPwaGuide ? (
-              <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronUp className="w-4 h-4 text-gray-500 shrink-0" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+              <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />
             )}
           </button>
 
           {showPwaGuide && (
-            <div className="p-3.5 sm:p-4 pt-1 sm:pt-2 space-y-3.5 border-t border-slate-800/60 text-xs text-slate-300 animate-in fade-in duration-150">
+            <div className="p-3.5 sm:p-4 pt-1 sm:pt-2 space-y-3.5 border-t border-gray-100 text-xs text-gray-700 animate-in fade-in duration-150">
               {/* Tabs: iPhone vs Android */}
-              <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800 gap-1">
+              <div className="flex rounded-xl bg-white p-1 border border-gray-100 gap-1">
                 <button
                   onClick={() => setActiveTab('ios')}
                   className={`flex-1 py-1.5 px-1 font-bold rounded-lg text-center transition text-[11px] sm:text-xs truncate ${
                     activeTab === 'ios'
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? '-white shadow-md'
+                      : 'text-gray-500 hover:text-gray-800'
                   }`}
                 >
                   🍎 iPhone (Safari)
@@ -122,8 +122,8 @@ export const Login: React.FC = () => {
                   onClick={() => setActiveTab('android')}
                   className={`flex-1 py-1.5 px-1 font-bold rounded-lg text-center transition text-[11px] sm:text-xs truncate ${
                     activeTab === 'android'
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? '-white shadow-md'
+                      : 'text-gray-500 hover:text-gray-800'
                   }`}
                 >
                   🤖 Android (Chrome)
@@ -132,12 +132,12 @@ export const Login: React.FC = () => {
 
               {/* iOS Guide */}
               {activeTab === 'ios' && (
-                <div className="space-y-2.5 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <div className="space-y-2.5 bg-white/60 p-3 rounded-xl border border-gray-100">
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">Safari 하단 공유 버튼 클릭</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                      <p className="font-semibold text-gray-800 leading-snug">Safari 하단 공유 버튼 클릭</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
                         화면 하단 중앙의 <Share className="w-3.5 h-3.5 text-blue-400 inline shrink-0" /> (공유) 아이콘을 누릅니다.
                       </p>
                     </div>
@@ -146,8 +146,8 @@ export const Login: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">'홈 화면에 추가' 선택</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                      <p className="font-semibold text-gray-800 leading-snug">'홈 화면에 추가' 선택</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
                         메뉴에서 <PlusSquare className="w-3.5 h-3.5 text-blue-400 inline shrink-0" /> <strong>[홈 화면에 추가]</strong>를 터치합니다.
                       </p>
                     </div>
@@ -156,8 +156,8 @@ export const Login: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-blue-900/80 text-blue-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">우측 상단 '추가' 누르기</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      <p className="font-semibold text-gray-800 leading-snug">우측 상단 '추가' 누르기</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
                         홈 화면에 CRA / PL 전용 앱 아이콘이 생성됩니다!
                       </p>
                     </div>
@@ -167,12 +167,12 @@ export const Login: React.FC = () => {
 
               {/* Android Guide */}
               {activeTab === 'android' && (
-                <div className="space-y-2.5 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <div className="space-y-2.5 bg-white/60 p-3 rounded-xl border border-gray-100">
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">Chrome/삼성 브라우저 메뉴 클릭</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                      <p className="font-semibold text-gray-800 leading-snug">Chrome/삼성 브라우저 메뉴 클릭</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
                         우측 상단 <MoreVertical className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> (더보기) 아이콘을 누릅니다.
                       </p>
                     </div>
@@ -181,8 +181,8 @@ export const Login: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">'앱 설치' 선택 (중요)</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                      <p className="font-semibold text-gray-800 leading-snug">'앱 설치' 선택 (중요)</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1 flex-wrap">
                         목록에서 <Download className="w-3.5 h-3.5 text-emerald-400 inline shrink-0" /> <strong>[앱 설치]</strong> (또는 홈 화면에 추가)를 선택합니다.
                       </p>
                     </div>
@@ -191,8 +191,8 @@ export const Login: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-emerald-900/80 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-200 leading-snug">'설치' 누르기 완료</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      <p className="font-semibold text-gray-800 leading-snug">'설치' 누르기 완료</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
                         주소창 없는 **독립 실행 독립 앱**으로 홈 화면에 생성됩니다!
                       </p>
                     </div>
@@ -204,8 +204,8 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Security Note */}
-        <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center pt-1">
-          <ShieldCheck className="w-4 h-4 text-slate-400" />
+        <div className="flex items-center justify-center gap-1.5 text-gray-500 text-xs text-center pt-1">
+          <ShieldCheck className="w-4 h-4 text-gray-500" />
           <span>보안된 개인 대시보드 환경</span>
         </div>
 

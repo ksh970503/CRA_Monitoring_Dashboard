@@ -49,16 +49,16 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="fixed inset-0 z-50 bg-gray-50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-gray-100 rounded-3xl w-full max-w-lg p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-lg -white">
               <Plus className="w-5 h-5" />
             </div>
-            <h2 className="text-lg font-bold text-white">오늘 업무 추가</h2>
+            <h2 className="text-lg font-bold text-gray-900">오늘 업무 추가</h2>
           </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-white rounded-lg">
+          <button onClick={onClose} className="p-1 text-gray-500 hover:text-gray-900 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -66,24 +66,24 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">날짜</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">날짜</label>
               <div className="relative">
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">과제 선택 (선택)</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">과제 선택 (선택)</label>
               <select
                 value={studyId}
                 onChange={(e) => setStudyId(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               >
                 <option value="">공통 / 과제 지정 안 함</option>
                 {studies.map((s) => (
@@ -96,7 +96,7 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">업무 유형</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">업무 유형</label>
             <div className="flex flex-wrap gap-1.5">
               {WORK_TYPES.map((type) => (
                 <button
@@ -105,8 +105,8 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
                   onClick={() => setWorkType(type)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                     workType === type
-                      ? 'bg-blue-600 text-white font-semibold shadow-sm'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                      ? '-white font-semibold shadow-sm'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   {type}
@@ -116,19 +116,19 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">오늘 한 일 내용</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">오늘 한 일 내용</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="예: 서울대병원 Site Visit & SDV 진행, SAE 보고서 2건 검토..."
               rows={3}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 resize-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">소요시간 (시간)</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">소요시간 (시간)</label>
             <input
               type="number"
               step="0.5"
@@ -136,18 +136,18 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
               max="24"
               value={hours}
               onChange={(e) => setHours(Number(e.target.value))}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
             />
           </div>
 
           {/* Follow-up Section */}
-          <div className="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-2xl space-y-3">
+          <div className="p-3.5 bg-gray-100 border border-gray-200/60 rounded-2xl space-y-3">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={needsFollowup}
                 onChange={(e) => setNeedsFollowup(e.target.checked)}
-                className="w-4 h-4 rounded bg-slate-900 border-slate-600 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded bg-white border-gray-200 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm font-semibold text-amber-400 flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4" /> Follow-up 필요 (Issue 자동 생성)
@@ -155,25 +155,25 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
             </label>
 
             {needsFollowup && (
-              <div className="space-y-3 pt-2 border-t border-slate-700/50 animate-in fade-in duration-150">
+              <div className="space-y-3 pt-2 border-t border-gray-200/50 animate-in fade-in duration-150">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Next Action</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Next Action</label>
                   <input
                     type="text"
                     value={nextAction}
                     onChange={(e) => setNextAction(e.target.value)}
                     placeholder="예: 이상반응 보고서 서명 회수 및 CRC 확인 요청"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
                     required={needsFollowup}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Due Date (마감일)</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Due Date (마감일)</label>
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
                     required={needsFollowup}
                   />
                 </div>
@@ -185,13 +185,13 @@ export const QuickWorkLogModal: React.FC<QuickWorkLogModalProps> = ({ isOpen, on
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700"
+              className="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-100"
             >
               취소
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/30"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:-white text-sm font-semibold shadow-sm shadow-blue-600/30"
             >
               업무일지 저장
             </button>
