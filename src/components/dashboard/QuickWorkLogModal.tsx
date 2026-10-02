@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { WorkType } from '../../types';
-import { X, Plus, Calendar, Clock, AlertCircle } from 'lucide-react';
+import { X, Plus, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface QuickWorkLogModalProps {

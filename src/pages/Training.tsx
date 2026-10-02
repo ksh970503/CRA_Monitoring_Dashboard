@@ -215,7 +215,7 @@ export const TrainingPage: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={(e) => {
+                  onClick={() => {
                     if (!window.confirm('이 교육 항목을 삭제하시겠습니까?')) return;
                     deleteTraining(t.id);
                   }}

@@ -10,10 +10,7 @@ import {
   Plus,
   UserPlus,
   Users,
-  Trash2,
-  Calendar,
-  AlertCircle,
-  FileText
+  Trash2
 } from 'lucide-react';
 
 export const StudyDetailPage: React.FC = () => {
@@ -23,8 +20,6 @@ export const StudyDetailPage: React.FC = () => {
     studies,
     milestones,
     contacts,
-    issues,
-    workLogs,
     updateStudy,
     toggleMilestone,
     addMilestone,
@@ -58,8 +53,6 @@ export const StudyDetailPage: React.FC = () => {
 
   const studyMilestones = milestones.filter((m) => m.study_id === study.id);
   const studyContacts = contacts.filter((c) => c.study_id === study.id);
-  const studyIssues = issues.filter((i) => i.study_id === study.id);
-  const studyLogs = workLogs.filter((w) => w.study_id === study.id);
 
   const progressPercent = study.site_total > 0 ? Math.round((study.site_closed / study.site_total) * 100) : 0;
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { Study, StudyStatus } from '../types';
+import { StudyStatus } from '../types';
 import { Link } from 'react-router-dom';
-import { FolderKanban, Plus, ChevronRight, Building, Layers, CheckSquare, Users, X } from 'lucide-react';
+import { FolderKanban, Plus, ChevronRight, Building, CheckSquare, Users, X } from 'lucide-react';
 
 export const StudiesPage: React.FC = () => {
   const { studies, milestones, contacts, addStudy } = useData();

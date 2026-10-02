@@ -1,6 +1,5 @@
 import * as XLSX from 'xlsx';
 import { WorkLog } from '../types';
-import { format } from 'date-fns';
 
 export function exportWorkLogsToExcel(logs: WorkLog[], monthStr: string) {
   const exportData = logs.map((log, index) => ({

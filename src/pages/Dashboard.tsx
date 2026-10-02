@@ -5,7 +5,6 @@ import {
   Plus,
   AlertTriangle,
   Clock,
-  CheckCircle2,
   Hourglass,
   GraduationCap,
   ChevronRight,
@@ -17,7 +16,7 @@ import { format, addDays } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
-  const { issues, trainings, workLogs, waitingItems, getDashboardSummary, toggleWaitingResolved } = useData();
+  const { issues, trainings, waitingItems, getDashboardSummary, toggleWaitingResolved } = useData();
   const [isQuickLogOpen, setIsQuickLogOpen] = useState(false);
   const [activeMobileCardIndex, setActiveMobileCardIndex] = useState(0);
 

@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, GraduationCap, FolderKanban, AlertCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, GraduationCap, FolderKanban, AlertCircle } from 'lucide-react';
 
 export const NAV_ITEMS = [
   { path: '/', label: '홈 대시보드', icon: LayoutDashboard },

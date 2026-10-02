@@ -18,11 +18,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [guestUser, setGuestUser] = useState<boolean>(() => {
     return localStorage.getItem('cra_guest_session') === 'true';
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!isSupabaseConfigured ? false : true);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      setLoading(false);
       return;
     }
 

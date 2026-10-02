@@ -128,7 +128,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   }, [storagePrefix, loadMockData]);
 
   // Seed user data to Supabase if newly registered user has an empty DB
-  const seedUserDataToSupabase = async () => {
+  const seedUserDataToSupabase = useCallback(async () => {
     if (!isSupabaseConfigured || isGuest || !userId) return;
     try {
       // 1. Insert studies with explicit user_id
@@ -234,7 +234,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     } catch (err) {
       console.error('Failed to seed user data into Supabase:', err);
     }
-  };
+  }, [isGuest, userId]);
 
   // Sync All current local state to Supabase manually/automatically
   const syncAllToSupabase = async (silent: boolean = false) => {
@@ -544,13 +544,33 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
 
         if (sRes.error) throw sRes.error;
 
-        setStudies(sRes.data || []);
-        setContacts(cRes.data || []);
-        setMilestones(mRes.data || []);
-        setWorkLogs(wRes.data || []);
-        setTrainings(tRes.data || []);
-        setIssues(iRes.data || []);
-        setWaitingItems(wtRes.data || []);
+        if ((sRes.data || []).length === 0) {
+          await seedUserDataToSupabase();
+          const [sRes2, cRes2, mRes2, wRes2, tRes2, iRes2, wtRes2] = await Promise.all([
+            supabase.from('studies').select('*').order('created_at', { ascending: false }),
+            supabase.from('study_contacts').select('*'),
+            supabase.from('study_milestones').select('*').order('sort_order'),
+            supabase.from('work_logs').select('*, studies(name)').order('date', { ascending: false }),
+            supabase.from('trainings').select('*').order('due_date'),
+            supabase.from('issues').select('*, studies(name)').order('due_date'),
+            supabase.from('waiting_items').select('*, studies(name), issues(title)'),
+          ]);
+          setStudies(sRes2.data || []);
+          setContacts(cRes2.data || []);
+          setMilestones(mRes2.data || []);
+          setWorkLogs(wRes2.data || []);
+          setTrainings(tRes2.data || []);
+          setIssues(iRes2.data || []);
+          setWaitingItems(wtRes2.data || []);
+        } else {
+          setStudies(sRes.data || []);
+          setContacts(cRes.data || []);
+          setMilestones(mRes.data || []);
+          setWorkLogs(wRes.data || []);
+          setTrainings(tRes.data || []);
+          setIssues(iRes.data || []);
+          setWaitingItems(wtRes.data || []);
+        }
 
       } catch (err) {
         console.warn('Supabase fetch failed, falling back to local data gracefully:', err);
@@ -595,7 +615,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
     }
 
     loadData();
-  }, [userId, isGuest, storagePrefix, loadMockData]);
+  }, [userId, isGuest, storagePrefix, loadMockData, seedUserDataToSupabase]);
 
   // Sync to localStorage (유저별 prefix로 저장)
   useEffect(() => {
@@ -612,9 +632,12 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
   }, [studies, contacts, milestones, workLogs, trainings, issues, waitingItems, loading, storagePrefix]);
 
   const syncRef = useRef(syncAllToSupabase);
-  syncRef.current = syncAllToSupabase;
 
   // 1시간 간격 자동 서버 동기화
+  useEffect(() => {
+    syncRef.current = syncAllToSupabase;
+  });
+
   useEffect(() => {
     if (isGuest || !isSupabaseConfigured || !userId) return;
     const interval = setInterval(() => {
@@ -622,14 +645,15 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, userId, is
       syncRef.current(true);
     }, 3600000);
     return () => clearInterval(interval);
-  }, [isGuest, isSupabaseConfigured, userId]);
+  }, [isGuest, userId]);
 
   // WorkLog Add + Auto Issue creation
   const addWorkLog = async (logData: Omit<WorkLog, 'id' | 'created_at'>) => {
+    const timestamp = Date.now();
     const newLog: WorkLog = {
       ...logData,
-      id: 'wl-' + Date.now(),
-      created_at: new Date().toISOString(),
+      id: 'wl-' + timestamp,
+      created_at: new Date(timestamp).toISOString(),
       studies: studies.find(s => s.id === logData.study_id) ? { name: studies.find(s => s.id === logData.study_id)!.name } : null
     };
 
