@@ -139,16 +139,16 @@ export const WorkLogPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 md:pb-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-100 p-4 sm:p-6 rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-4 sm:p-6 rounded-3xl shadow-xl backdrop-blur-md">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">업무일지 작성 & 월별 집계</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">업무일지 작성 & 월별 집계</h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             일일 업무 기록 및 유형별 소요시간 분석 (Follow-up 설정 시 Issue 자동 연동)
           </p>
         </div>
         <button
           onClick={() => exportWorkLogsToExcel(filteredLogs, selectedMonth)}
-          className="px-4 py-2.5 bg-emerald-600 hover:-white font-semibold text-sm rounded-2xl shadow-sm shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shrink-0"
         >
           <FileSpreadsheet className="w-4 h-4" />
           <span>엑셀 내보내기 ({selectedMonth})</span>
@@ -156,13 +156,13 @@ export const WorkLogPage: React.FC = () => {
       </div>
 
       {/* Work Log Entry / Edit Form Card */}
-      <div className={`border rounded-3xl p-4 sm:p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] ${
+      <div className={`border rounded-3xl p-4 sm:p-6 shadow-xl space-y-5 backdrop-blur-sm card-spring ${
         isEditing
-          ? 'bg-amber-50 border-amber-700/60'
-          : 'bg-white border-gray-100'
+          ? 'bg-amber-950/20 border-amber-700/60'
+          : 'bg-slate-900/90 border-slate-800'
       }`}>
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
             {isEditing ? (
               <><Pencil className="w-5 h-5 text-amber-400" /> 업무일지 수정 중</>
             ) : (
@@ -172,7 +172,7 @@ export const WorkLogPage: React.FC = () => {
           {isEditing && (
             <button
               onClick={cancelEdit}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-100 text-gray-700 text-xs rounded-xl transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl transition"
             >
               <X className="w-3.5 h-3.5" /> 취소
             </button>
@@ -182,21 +182,21 @@ export const WorkLogPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">날짜</label>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">날짜</label>
               <input
                 type="date"
                 value={form.date}
                 onChange={e => setField('date', e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">과제 선택 (선택)</label>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">과제 선택 (선택)</label>
               <select
                 value={form.studyId}
                 onChange={e => setField('studyId', e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
               >
                 <option value="">공통 / 과제 지정 안 함</option>
                 {studies.map(s => (
@@ -205,7 +205,7 @@ export const WorkLogPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">소요시간 (시간)</label>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">소요시간 (시간)</label>
               <input
                 type="number"
                 step="0.5"
@@ -213,14 +213,14 @@ export const WorkLogPage: React.FC = () => {
                 max="24"
                 value={form.hours}
                 onChange={e => setField('hours', Number(e.target.value))}
-                className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">업무 유형</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5">업무 유형</label>
             <div className="flex flex-wrap gap-1.5">
               {WORK_TYPES.map(type => (
                 <button
@@ -229,8 +229,8 @@ export const WorkLogPage: React.FC = () => {
                   onClick={() => setField('workType', type)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 active:scale-95 ${
                     form.workType === type
-                      ? '-white shadow-md shadow-blue-600/30'
-                      : 'bg-gray-100 text-gray-500 hover:bg-gray-100'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                   }`}
                 >
                   {type}
@@ -240,25 +240,25 @@ export const WorkLogPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">오늘 한 일 내용</label>
+            <label className="block text-xs font-semibold text-slate-400 mb-1">오늘 한 일 내용</label>
             <textarea
               value={form.content}
               onChange={e => setField('content', e.target.value)}
               placeholder="예: 서울대병원 Site Visit & SDV 진행, SAE 보고서 2건 검토..."
               rows={3}
-              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
               required
             />
           </div>
 
           {/* Follow-up Section */}
-          <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-3">
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-2xl space-y-3">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={form.needsFollowup}
                 onChange={e => setField('needsFollowup', e.target.checked)}
-                className="w-4 h-4 rounded bg-white border-gray-200 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded bg-slate-900 border-slate-600 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4" /> Follow-up 필요 (Check 시 Issue 자동 등록)
@@ -266,25 +266,25 @@ export const WorkLogPage: React.FC = () => {
             </label>
 
             {form.needsFollowup && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Next Action</label>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Next Action</label>
                   <input
                     type="text"
                     value={form.nextAction}
                     onChange={e => setField('nextAction', e.target.value)}
                     placeholder="예: 이상반응 보고서 서명 회수 및 CRC 확인"
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
                     required={form.needsFollowup}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Due Date (마감일)</label>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Due Date (마감일)</label>
                   <input
                     type="date"
                     value={form.dueDate}
                     onChange={e => setField('dueDate', e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
                     required={form.needsFollowup}
                   />
                 </div>
@@ -295,10 +295,10 @@ export const WorkLogPage: React.FC = () => {
           <div className="flex justify-end pt-2">
             <button
               type="submit"
-              className={`w-full sm:w-auto px-6 py-3 font-bold text-sm rounded-xl shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 justify-center ${
+              className={`w-full sm:w-auto px-6 py-3 font-bold text-sm rounded-xl shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 justify-center ${
                 isEditing
-                  ? 'bg-amber-600 hover:-white shadow-amber-600/30'
-                  : 'bg-blue-600 hover:-white shadow-blue-600/30'
+                  ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/30'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
               }`}
             >
               {isEditing ? <><Save className="w-4 h-4" /> 수정 저장</> : '업무일지 저장'}
@@ -308,30 +308,30 @@ export const WorkLogPage: React.FC = () => {
       </div>
 
       {/* Monthly Summary & Bar Chart */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-4 sm:p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-6 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-6 backdrop-blur-sm card-spring">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <BarChart3 className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-base sm:text-lg font-bold text-gray-900">월별 업무 유형별 소요시간 집계</h2>
+            <h2 className="text-base sm:text-lg font-bold text-white">월별 업무 유형별 소요시간 집계</h2>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-100">
-              <Filter className="w-3.5 h-3.5 text-gray-500" />
+            <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+              <Filter className="w-3.5 h-3.5 text-slate-400" />
               <input
                 type="month"
                 value={selectedMonth}
                 onChange={e => setSelectedMonth(e.target.value)}
-                className="bg-transparent text-xs font-bold text-gray-900 focus:outline-none"
+                className="bg-transparent text-xs font-bold text-white focus:outline-none"
               />
             </div>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-slate-400">
               총 소요시간: <strong className="text-blue-400 text-sm">{totalMonthlyHours}시간</strong>
             </span>
           </div>
         </div>
 
         {chartData.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 bg-gray-50 rounded-2xl text-xs">
+          <div className="p-8 text-center text-slate-500 bg-slate-950/40 rounded-2xl text-xs">
             {selectedMonth} 월에 기록된 업무 데이터가 없습니다.
           </div>
         ) : (
@@ -356,11 +356,11 @@ export const WorkLogPage: React.FC = () => {
       </div>
 
       {/* Work Log History List */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-4 sm:p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-4 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-        <h2 className="text-base font-bold text-gray-900">업무일지 목록 ({filteredLogs.length}건)</h2>
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-4 backdrop-blur-sm card-spring">
+        <h2 className="text-base font-bold text-white">업무일지 목록 ({filteredLogs.length}건)</h2>
 
         {filteredLogs.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 bg-gray-50 rounded-2xl text-xs">
+          <div className="p-8 text-center text-slate-500 bg-slate-950/40 rounded-2xl text-xs">
             이 달의 기록된 업무일지가 없습니다.
           </div>
         ) : (
@@ -368,10 +368,10 @@ export const WorkLogPage: React.FC = () => {
             {filteredLogs.map(log => (
               <div
                 key={log.id}
-                className={`p-4 border rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] ${
+                className={`p-4 border rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 card-spring ${
                   editingId === log.id
-                    ? 'bg-amber-50 border-amber-700/60'
-                    : 'bg-gray-50 border-gray-100'
+                    ? 'bg-amber-950/20 border-amber-700/60'
+                    : 'bg-slate-950/60 border-slate-800/80'
                 }`}
               >
                 <div className="space-y-1.5 min-w-0 pr-2">
@@ -379,13 +379,13 @@ export const WorkLogPage: React.FC = () => {
                     <span className="px-2.5 py-0.5 rounded-lg bg-blue-600/30 text-blue-300 font-bold text-xs">
                       {log.work_type}
                     </span>
-                    <span className="text-xs font-semibold text-gray-500">{log.studies?.name || '공통'}</span>
-                    <span className="text-xs font-mono text-gray-400">• {log.date}</span>
-                    <span className="text-xs font-bold text-gray-700">{log.hours}시간</span>
+                    <span className="text-xs font-semibold text-slate-400">{log.studies?.name || '공통'}</span>
+                    <span className="text-xs font-mono text-slate-500">• {log.date}</span>
+                    <span className="text-xs font-bold text-slate-300">{log.hours}시간</span>
                   </div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-900">{log.content}</p>
+                  <p className="text-xs sm:text-sm font-medium text-white">{log.content}</p>
                   {log.needs_followup && (
-                    <div className="text-xs text-amber-300 bg-amber-50 px-3 py-1 rounded-xl border border-amber-100 inline-flex items-center gap-1.5">
+                    <div className="text-xs text-amber-300 bg-amber-950/40 px-3 py-1 rounded-xl border border-amber-800/40 inline-flex items-center gap-1.5">
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span>Next Action: {log.next_action} (Due: {log.due_date})</span>
                     </div>
@@ -397,8 +397,8 @@ export const WorkLogPage: React.FC = () => {
                     onClick={() => editingId === log.id ? cancelEdit() : openEdit(log)}
                     className={`p-2 rounded-xl transition active:scale-90 ${
                       editingId === log.id
-                        ? 'text-amber-400 bg-amber-50 hover:bg-amber-900/50'
-                        : 'text-gray-400 hover:text-blue-400 hover:bg-gray-100'
+                        ? 'text-amber-400 bg-amber-950/30 hover:bg-amber-900/50'
+                        : 'text-slate-500 hover:text-blue-400 hover:bg-slate-800'
                     }`}
                     title={editingId === log.id ? '수정 취소' : '수정'}
                   >
@@ -406,7 +406,7 @@ export const WorkLogPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleDelete(log.id)}
-                    className="p-2 text-gray-400 hover:text-rose-400 hover:bg-gray-100 rounded-xl transition active:scale-90"
+                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition active:scale-90"
                     title="삭제"
                   >
                     <Trash2 className="w-4 h-4" />
